@@ -1,0 +1,56 @@
+name: Deploy CMS to VPS
+
+on:
+  push:
+    branches: [production]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-okkolo-cms
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Rsync sources to server
+        run: |
+          rsync -az --delete --human-readable \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='.tmp' \
+            --exclude='.cache' \
+            --exclude='.strapi' \
+            --exclude='.strapi-updater.json' \
+            --exclude='dist' \
+            --exclude='build' \
+            --exclude='public/uploads' \
+            ./ \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/apps/cms/"
+
+      - name: Install, build, restart on server
+        run: |
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" bash -se <<'EOF'
+            set -euo pipefail
+            cd ~/apps/cms
+            npm ci
+            npm run build
+            pm2 restart okkolo-cms --update-env
+            pm2 save
+          EOF
