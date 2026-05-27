@@ -1,7 +1,7 @@
 import type { Core } from '@strapi/strapi';
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewares => {
-  const origins = env('CORS_ORIGIN', 'http://localhost:5180,https://okkolo.vercel.app')
+  const origins = env('CORS_ORIGIN', 'http://localhost:5173,http://localhost:5180,https://okkolo.vercel.app')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);

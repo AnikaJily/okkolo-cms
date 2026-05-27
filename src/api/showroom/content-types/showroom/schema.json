@@ -1,23 +1,17 @@
 {
   "kind": "collectionType",
-  "collectionName": "directions",
+  "collectionName": "showrooms",
   "info": {
-    "singularName": "direction",
-    "pluralName": "directions",
-    "displayName": "Направления"
+    "singularName": "showroom",
+    "pluralName": "showrooms",
+    "displayName": "Шоурум"
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
-      "type": "string"
-    },
-    "description": {
-      "type": "text"
-    },
-    "image": {
+    "heroImage": {
       "type": "media",
       "multiple": false,
       "allowedTypes": [

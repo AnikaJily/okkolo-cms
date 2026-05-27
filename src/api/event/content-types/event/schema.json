@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "events",
+  "info": {
+    "singularName": "event",
+    "pluralName": "events",
+    "displayName": "Мероприятия"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "date": {
+      "type": "datetime"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "description": {
+      "type": "text"
+    },
+    "isPaid": {
+      "type": "boolean"
+    },
+    "Price": {
+      "type": "integer"
+    },
+    "paymentUrl": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "музыка",
+        "мастер-класс",
+        "лекция",
+        "стенд-ап"
+      ]
+    },
+    "spotsTotal": {
+      "type": "integer"
+    },
+    "spotsTaken": {
+      "type": "integer"
+    }
+  }
+}
