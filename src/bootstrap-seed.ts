@@ -9,7 +9,8 @@ type EventType = 'музыка' | 'мастер-класс' | 'лекция' | '
 interface DirectionSeed {
   title: string;
   description: string;
-  picsumSeed: string;
+  keywords: string;
+  lock: number;
 }
 
 interface EventSeed {
@@ -22,7 +23,8 @@ interface EventSeed {
   type: EventType;
   spotsTotal: number;
   spotsTaken: number;
-  picsumSeed: string;
+  keywords: string;
+  lock: number;
 }
 
 interface ProductSeed {
@@ -31,331 +33,145 @@ interface ProductSeed {
   category: ProductCategory;
   description: string;
   cartUrl: string | null;
-  picsumSeed: string;
+  keywords: string;
+  lock: number;
 }
 
 const DIRECTIONS: DirectionSeed[] = [
-  {
-    title: 'Кофейня',
-    description: 'Вкусный кофе, сезонные сладости и спокойное место, где можно встретиться или поработать.',
-    picsumSeed: 'okkolo-cafe',
-  },
-  {
-    title: 'Мастерские',
-    description:
-      'Живые студии и курсы: керамика, текстиль, ювелирка и графика — рядом с кофейней, в спокойном темпе и с наставниками.',
-    picsumSeed: 'okkolo-workshops',
-  },
-  {
-    title: 'Шоурум',
-    description: 'Изделия мастерских и небольшие тиражи от местных авторов: керамика, текстиль, украшения и одежда.',
-    picsumSeed: 'okkolo-showroom',
-  },
-  {
-    title: 'События',
-    description: 'Концерты, мастер-классы и лекции в дружелюбной атмосфере — для всех, кто рядом.',
-    picsumSeed: 'okkolo-events',
-  },
-  {
-    title: 'Гончарная студия «На кругу»',
-    description: 'Керамика для города: спокойный круг, руки в глине и понятный путь от комка до застеклованной чашки.',
-    picsumSeed: 'okkolo-pottery',
-  },
-  {
-    title: 'Текстильная мастерская «Узел»',
-    description: 'Ткачество на раме, батик и аккуратный шов — чтобы дом стал чуть теплее на ощупь.',
-    picsumSeed: 'okkolo-textile',
-  },
-  {
-    title: 'Ювелирная лаборатория «Застёжка»',
-    description: 'Литьё из воска, пайка и аккуратная полировка — небольшие изделия с характером.',
-    picsumSeed: 'okkolo-jewelry',
-  },
-  {
-    title: 'Студия печати «Лист»',
-    description: 'Линогравюра и монотипия: быстрый результат, понятная техника и аккуратная типографика.',
-    picsumSeed: 'okkolo-print',
-  },
+  { title: 'Кофейня', description: 'Вкусный кофе, сезонные сладости и спокойное место, где можно встретиться или поработать.', keywords: 'cafe,coffee', lock: 1001 },
+  { title: 'Мастерские', description: 'Живые студии и курсы: керамика, текстиль, ювелирка и графика — рядом с кофейней, в спокойном темпе и с наставниками.', keywords: 'workshop,craft', lock: 1002 },
+  { title: 'Шоурум', description: 'Изделия мастерских и небольшие тиражи от местных авторов: керамика, текстиль, украшения и одежда.', keywords: 'showroom,interior', lock: 1003 },
+  { title: 'События', description: 'Концерты, мастер-классы и лекции в дружелюбной атмосфере — для всех, кто рядом.', keywords: 'event,concert', lock: 1004 },
+  { title: 'Гончарная студия «На кругу»', description: 'Керамика для города: спокойный круг, руки в глине и понятный путь от комка до застеклованной чашки.', keywords: 'pottery,ceramics', lock: 1005 },
+  { title: 'Текстильная мастерская «Узел»', description: 'Ткачество на раме, батик и аккуратный шов — чтобы дом стал чуть теплее на ощупь.', keywords: 'textile,fabric', lock: 1006 },
+  { title: 'Ювелирная лаборатория «Застёжка»', description: 'Литьё из воска, пайка и аккуратная полировка — небольшие изделия с характером.', keywords: 'jewelry,silver', lock: 1007 },
+  { title: 'Студия печати «Лист»', description: 'Линогравюра и монотипия: быстрый результат, понятная техника и аккуратная типографика.', keywords: 'print,linocut', lock: 1008 },
 ];
 
-function daysFromNow(days: number, hours = 19, minutes = 0): string {
+function dayAt(daysFromNow: number, hours: number, minutes = 0): string {
   const d = new Date();
-  d.setDate(d.getDate() + days);
+  d.setDate(d.getDate() + daysFromNow);
   d.setHours(hours, minutes, 0, 0);
   return d.toISOString();
 }
 
+// 10 дней, по 2-4 события на день, разные типы и темы
 const EVENTS: EventSeed[] = [
-  {
-    title: 'Вечер живого джаза',
-    date: daysFromNow(3, 19, 0),
-    description:
-      'Тёплый вечер с трио музыкантов из Краснодара: стандарты Эллингтона и пара современных номеров. Бар работает весь вечер.',
-    isPaid: false,
-    Price: null,
-    paymentUrl: null,
-    type: 'музыка',
-    spotsTotal: 40,
-    spotsTaken: 12,
-    picsumSeed: 'event-jazz',
-  },
-  {
-    title: 'Мастер-класс по керамике для начинающих',
-    date: daysFromNow(5, 14, 0),
-    description:
-      'Двухчасовая встреча: центрируем глину на круге, делаем простую пиалу или кружку. Подходит для тех, кто впервые садится за круг.',
-    isPaid: true,
-    Price: 2400,
-    paymentUrl: null,
-    type: 'мастер-класс',
-    spotsTotal: 7,
-    spotsTaken: 4,
-    picsumSeed: 'event-ceramics',
-  },
-  {
-    title: 'Книжный клуб: «Маленький принц»',
-    date: daysFromNow(7, 18, 30),
-    description:
-      'Встреча книжного клуба «Окколо»: разбираем главы, делимся впечатлениями, пьём чай. Можно прийти даже если перечитали по диагонали.',
-    isPaid: false,
-    Price: null,
-    paymentUrl: null,
-    type: 'лекция',
-    spotsTotal: 25,
-    spotsTaken: 8,
-    picsumSeed: 'event-book',
-  },
-  {
-    title: 'Стенд-ап вечер: открытый микрофон',
-    date: daysFromNow(10, 20, 0),
-    description:
-      'Открытый микрофон для местных комиков. 8 выступающих, по 7 минут. Если хотите выйти — напишите нам заранее.',
-    isPaid: true,
-    Price: 500,
-    paymentUrl: null,
-    type: 'стенд-ап',
-    spotsTotal: 50,
-    spotsTaken: 22,
-    picsumSeed: 'event-standup',
-  },
-  {
-    title: 'Лекция: «Зачем городу инклюзивные пространства»',
-    date: daysFromNow(12, 19, 30),
-    description:
-      'Разговор с проектировщицей доступных сред: что такое универсальный дизайн, как работают инклюзивные кафе и почему это выгодно бизнесу.',
-    isPaid: false,
-    Price: null,
-    paymentUrl: null,
-    type: 'лекция',
-    spotsTotal: 35,
-    spotsTaken: 14,
-    picsumSeed: 'event-lecture',
-  },
-  {
-    title: 'Воркшоп по линогравюре',
-    date: daysFromNow(15, 17, 0),
-    description:
-      'Два часа практики: эскиз → перенос на линолеум → пробный оттиск. Уносите серию открыток собственной печати.',
-    isPaid: true,
-    Price: 1900,
-    paymentUrl: null,
-    type: 'мастер-класс',
-    spotsTotal: 10,
-    spotsTaken: 3,
-    picsumSeed: 'event-lino',
-  },
-  {
-    title: 'Акустический вечер: песни под гитару',
-    date: daysFromNow(18, 19, 0),
-    description:
-      'Дуэт гитаристов, кавер-программа и пара авторских песен. Свет приглушённый, можно сидеть на подушках.',
-    isPaid: false,
-    Price: null,
-    paymentUrl: null,
-    type: 'музыка',
-    spotsTotal: 40,
-    spotsTaken: 17,
-    picsumSeed: 'event-acoustic',
-  },
-  {
-    title: 'Мастер-класс по текстильной аппликации',
-    date: daysFromNow(22, 12, 0),
-    description:
-      'Делаем небольшое настенное панно из лоскутов: подбор палитры, раскладка, шов через край. Материалы включены.',
-    isPaid: true,
-    Price: 1600,
-    paymentUrl: null,
-    type: 'мастер-класс',
-    spotsTotal: 8,
-    spotsTaken: 5,
-    picsumSeed: 'event-applique',
-  },
+  // День 1
+  { title: 'Вечер живого джаза',                       date: dayAt(1, 19, 0),  description: 'Тёплый вечер с трио из Краснодара: стандарты Эллингтона и пара современных номеров. Бар работает весь вечер.', isPaid: false, Price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 40, spotsTaken: 12, keywords: 'jazz,concert',     lock: 2001 },
+  { title: 'Утренний фриланс-завтрак',                 date: dayAt(1, 9, 30),  description: 'Открытое утро для тех, кто работает из кафе: розетки, тихий стол и кофе по специальной цене.',                isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 20, spotsTaken: 7,  keywords: 'coffee,laptop',    lock: 2002 },
+
+  // День 2
+  { title: 'Мастер-класс: первая кружка на гончарном круге', date: dayAt(2, 14, 0), description: 'Двухчасовая встреча: центрируем глину, лепим простую кружку. Подходит тем, кто впервые садится за круг.', isPaid: true, Price: 2400, paymentUrl: null, type: 'мастер-класс', spotsTotal: 7,  spotsTaken: 4,  keywords: 'pottery,clay',   lock: 2003 },
+  { title: 'Лекция: история инклюзивных пространств',  date: dayAt(2, 19, 30), description: 'Куратор «Окколо» рассказывает, как устроены инклюзивные кафе и почему это становится новой нормой.',          isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 35, spotsTaken: 18, keywords: 'lecture,books',   lock: 2004 },
+  { title: 'Стенд-ап вечер: открытый микрофон',        date: dayAt(2, 21, 0),  description: 'Открытый микрофон для местных комиков. 8 выступающих по 7 минут. Хотите выйти — напишите заранее.',           isPaid: true,  Price: 500,  paymentUrl: null, type: 'стенд-ап',     spotsTotal: 50, spotsTaken: 22, keywords: 'standup,microphone', lock: 2005 },
+
+  // День 3
+  { title: 'Книжный клуб: «Маленький принц»',          date: dayAt(3, 18, 30), description: 'Разбираем главы, делимся впечатлениями, пьём чай. Можно прийти даже если перечитали по диагонали.',           isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 25, spotsTaken: 8,  keywords: 'book,reading',     lock: 2006 },
+  { title: 'Воркшоп по линогравюре',                   date: dayAt(3, 17, 0),  description: 'Два часа практики: эскиз → перенос на линолеум → пробный оттиск. Уносите серию открыток собственной печати.', isPaid: true,  Price: 1900, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 3,  keywords: 'print,linocut',    lock: 2007 },
+
+  // День 4
+  { title: 'Акустический вечер: песни под гитару',     date: dayAt(4, 19, 0),  description: 'Дуэт гитаристов, кавер-программа и пара авторских песен. Свет приглушённый, можно сидеть на подушках.',     isPaid: false, Price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 40, spotsTaken: 17, keywords: 'guitar,acoustic',  lock: 2008 },
+  { title: 'Мастер-класс: текстильная аппликация',     date: dayAt(4, 12, 0),  description: 'Делаем небольшое настенное панно из лоскутов: подбор палитры, раскладка, шов через край. Материалы включены.', isPaid: true, Price: 1600, paymentUrl: null, type: 'мастер-класс', spotsTotal: 8,  spotsTaken: 5,  keywords: 'fabric,sewing',  lock: 2009 },
+  { title: 'Лекция: «Цвет в интерьере»',               date: dayAt(4, 19, 30), description: 'Дизайнер-колорист объясняет, как работает цвет в маленькой квартире и какие сочетания не утомляют глаз.',      isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 30, spotsTaken: 11, keywords: 'color,interior',   lock: 2010 },
+
+  // День 5
+  { title: 'Стенд-ап: премьерная программа гостя',      date: dayAt(5, 20, 0),  description: 'Гастролирующий комик из Москвы привозит первый прогон новой программы. Билеты ограничены.',                   isPaid: true,  Price: 1200, paymentUrl: null, type: 'стенд-ап',     spotsTotal: 60, spotsTaken: 41, keywords: 'comedy,standup',   lock: 2011 },
+  { title: 'Мастер-класс по ювелирному литью',         date: dayAt(5, 16, 0),  description: 'Делаем восковую модель и отливаем латунный кулон. Финишинг и подгонка — на месте.',                            isPaid: true,  Price: 3200, paymentUrl: null, type: 'мастер-класс', spotsTotal: 5,  spotsTaken: 2,  keywords: 'jewelry,silver',   lock: 2012 },
+
+  // День 6
+  { title: 'Концерт: фолк-квартет «Стрепет»',          date: dayAt(6, 19, 30), description: 'Краснодарский фолк-квартет: голос, гитара, гадулка и перкуссия. Большая программа на полтора часа.',           isPaid: true,  Price: 800,  paymentUrl: null, type: 'музыка',       spotsTotal: 50, spotsTaken: 29, keywords: 'folk,band',        lock: 2013 },
+  { title: 'Книжный клуб: «Шум времени»',              date: dayAt(6, 18, 0),  description: 'Обсуждаем роман Барнса о Шостаковиче и эпохе. Без подготовки тоже можно — у нас есть краткое содержание.',     isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 20, spotsTaken: 9,  keywords: 'book,literature',  lock: 2014 },
+  { title: 'Воркшоп: блокнот ручного переплёта',       date: dayAt(6, 13, 0),  description: 'Сшиваем А5-блокнот на нитку и делаем мягкую обложку из крафта. Уносите 80 страниц своих будущих записей.',     isPaid: true,  Price: 1400, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 6,  keywords: 'book,binding',     lock: 2015 },
+
+  // День 7
+  { title: 'Лекция: «Кофейная карта Краснодара»',      date: dayAt(7, 19, 0),  description: 'Обзор третьей волны от бариста «Окколо»: что пить дома, как читать упаковку, кому доверять обжарку.',          isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 35, spotsTaken: 14, keywords: 'coffee,espresso',  lock: 2016 },
+  { title: 'Открытая студия керамики',                 date: dayAt(7, 15, 0),  description: 'Свободный доступ к кругам и материалам. Наставник рядом, но программу выбираете сами.',                         isPaid: true,  Price: 900,  paymentUrl: null, type: 'мастер-класс', spotsTotal: 6,  spotsTaken: 2,  keywords: 'pottery,ceramics', lock: 2017 },
+
+  // День 8
+  { title: 'Винил-вечер: соул и фанк 70-х',            date: dayAt(8, 20, 0),  description: 'Резиденты крутят винил, а кухня собирает закусочный сет. Танцпол небольшой, но настоящий.',                    isPaid: false, Price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 50, spotsTaken: 23, keywords: 'vinyl,music',      lock: 2018 },
+  { title: 'Мастер-класс по батику',                   date: dayAt(8, 12, 0),  description: 'Узелковый и трафаретный батик на хлопке. Уносите готовый шарф или платок.',                                    isPaid: true,  Price: 2100, paymentUrl: null, type: 'мастер-класс', spotsTotal: 8,  spotsTaken: 4,  keywords: 'fabric,dye',       lock: 2019 },
+  { title: 'Лекция: «Доступная среда для бизнеса»',    date: dayAt(8, 18, 30), description: 'Что считается доступным, как это считать в деньгах и какие ошибки совершают чаще всего при ремонте кафе.',     isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 40, spotsTaken: 19, keywords: 'lecture,city',     lock: 2020 },
+
+  // День 9
+  { title: 'Поэтический вечер: открытый микрофон',     date: dayAt(9, 19, 0),  description: 'Тёплая аудитория, мягкий свет и 5 минут на каждое выступление. Можно слушать, можно читать.',                  isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 30, spotsTaken: 10, keywords: 'poetry,reading',   lock: 2021 },
+  { title: 'Мастер-класс: серьги из латуни',           date: dayAt(9, 16, 0),  description: 'За два с половиной часа собираем пару серёг: эскиз, выпиловка, шлифовка, фурнитура.',                          isPaid: true,  Price: 2800, paymentUrl: null, type: 'мастер-класс', spotsTotal: 5,  spotsTaken: 3,  keywords: 'jewelry,brass',    lock: 2022 },
+  { title: 'Стенд-ап: женский лайнап',                 date: dayAt(9, 21, 0),  description: 'Четыре комикессы города в одной программе. Темы — городская жизнь, родители, дейтинг и работа.',                isPaid: true,  Price: 700,  paymentUrl: null, type: 'стенд-ап',     spotsTotal: 50, spotsTaken: 27, keywords: 'standup,comedy',   lock: 2023 },
+
+  // День 10
+  { title: 'Семейное утро с настольными играми',       date: dayAt(10, 11, 0), description: 'Подборка игр для разных возрастов, помощь ведущего и тёплые напитки. Приходите с детьми от 5 лет.',             isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 24, spotsTaken: 8,  keywords: 'board,games',      lock: 2024 },
+  { title: 'Концерт: камерный струнный квартет',       date: dayAt(10, 19, 0), description: 'Часовая программа из барокко и неоклассики. Места — кресла полукругом, как в маленьком зале.',                 isPaid: true,  Price: 1500, paymentUrl: null, type: 'музыка',       spotsTotal: 45, spotsTaken: 33, keywords: 'classical,string', lock: 2025 },
+  { title: 'Воркшоп по монотипии',                     date: dayAt(10, 15, 0), description: 'Печать с гладкой пластины: один оттиск — одно настроение. Уносите серию из 8–10 листов.',                       isPaid: true,  Price: 1700, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 5,  keywords: 'print,art',        lock: 2026 },
 ];
 
-const PRODUCTS: ProductSeed[] = [
-  {
-    title: 'Бусы «Долматинец»',
-    price: 2100,
-    category: 'jewelry',
-    description: 'Бусы из натурального камня в спокойной серо-чёрной гамме. Универсальная длина — подходят на каждый день.',
-    cartUrl: null,
-    picsumSeed: 'p-beads-dalmatian',
-  },
-  {
-    title: 'Ваза ручной работы',
-    price: 3200,
-    category: 'ceramics',
-    description: 'Керамическая ваза с мягкой матовой глазурью. Каждое изделие чуть отличается по оттенку — это часть ручной работы.',
-    cartUrl: null,
-    picsumSeed: 'p-vase',
-  },
-  {
-    title: 'Льняная салфетка',
-    price: 890,
-    category: 'textile',
-    description: 'Салфетка из натурального льна с обработанным краем. Хорошо переносит стирку и со временем становится мягче.',
-    cartUrl: null,
-    picsumSeed: 'p-napkin',
-  },
-  {
-    title: 'Сумка-шопер из хлопка',
-    price: 1500,
-    category: 'clothing',
-    description: 'Плотный хлопковый шопер с длинными ручками. Выдерживает книги, ноутбук и пару продуктов из магазина.',
-    cartUrl: null,
-    picsumSeed: 'p-tote',
-  },
-  {
-    title: 'Кружка «Окколо»',
-    price: 1200,
-    category: 'ceramics',
-    description: 'Керамическая кружка на 300 мл с фирменной маркировкой на поддоне. Удобно ложится в руку.',
-    cartUrl: null,
-    picsumSeed: 'p-cup',
-  },
-  {
-    title: 'Браслет «Жемчуг»',
-    price: 1800,
-    category: 'jewelry',
-    description: 'Тонкий браслет с пресноводным жемчугом и латунной фурнитурой. Регулируемая длина.',
-    cartUrl: null,
-    picsumSeed: 'p-bracelet',
-  },
-  {
-    title: 'Дорожка на стол',
-    price: 2400,
-    category: 'textile',
-    description: 'Тканая дорожка длиной 140 см в нейтральной палитре. Подходит и под праздничную сервировку, и для повседневного стола.',
-    cartUrl: null,
-    picsumSeed: 'p-runner',
-  },
-  {
-    title: 'Рубашка льняная',
-    price: 4500,
-    category: 'clothing',
-    description: 'Свободного кроя, без подкладки. Лён мягко мнётся и держит форму. Размеры S–XL.',
-    cartUrl: null,
-    picsumSeed: 'p-shirt',
-  },
-  {
-    title: 'Набор мисок',
-    price: 2800,
-    category: 'ceramics',
-    description: 'Три миски разного диаметра в одной палитре. Подходят для духовки и микроволновки.',
-    cartUrl: null,
-    picsumSeed: 'p-bowls',
-  },
-  {
-    title: 'Серьги «Солнце»',
-    price: 1650,
-    category: 'jewelry',
-    description: 'Латунные серьги с лёгкой полировкой. Дужка из медицинской стали — комфортно носить целый день.',
-    cartUrl: null,
-    picsumSeed: 'p-earrings',
-  },
-  {
-    title: 'Шарф шерстяной',
-    price: 2200,
-    category: 'textile',
-    description: 'Тонкая шерсть мериноса, мягкая бахрома по краям. Размер 30×180 см.',
-    cartUrl: null,
-    picsumSeed: 'p-scarf',
-  },
-  {
-    title: 'Тарелка десертная',
-    price: 1400,
-    category: 'ceramics',
-    description: 'Плоская керамическая тарелка диаметром 18 см с лёгкой деформацией края.',
-    cartUrl: null,
-    picsumSeed: 'p-plate',
-  },
-  {
-    title: 'Колье на цепочке',
-    price: 2400,
-    category: 'jewelry',
-    description: 'Тонкая цепочка с подвеской из латуни, длина 50 см. Подходит под лёгкие футболки и водолазки.',
-    cartUrl: null,
-    picsumSeed: 'p-necklace',
-  },
-  {
-    title: 'Платок шёлковый',
-    price: 3100,
-    category: 'textile',
-    description: 'Натуральный шёлк, ручная роспись горячим батиком. Каждый платок уникален.',
-    cartUrl: null,
-    picsumSeed: 'p-silk',
-  },
-  {
-    title: 'Худи унисекс',
-    price: 5200,
-    category: 'clothing',
-    description: 'Плотный хлопковый футер, прямой крой, карман-кенгуру. Печать «Окколо» на спине.',
-    cartUrl: null,
-    picsumSeed: 'p-hoodie',
-  },
-  {
-    title: 'Подсвечник',
-    price: 1600,
-    category: 'ceramics',
-    description: 'Керамический подсвечник для одной свечи-таблетки. Глазурь матовая, под цвет стола.',
-    cartUrl: null,
-    picsumSeed: 'p-candle',
-  },
+const PRODUCT_TEMPLATES: Omit<ProductSeed, 'lock'>[] = [
+  { title: 'Бусы «Долматинец»',       price: 2100, category: 'jewelry',  description: 'Бусы из натурального камня в спокойной серо-чёрной гамме. Универсальная длина — на каждый день.', cartUrl: null, keywords: 'beads,necklace' },
+  { title: 'Ваза ручной работы',      price: 3200, category: 'ceramics', description: 'Керамическая ваза с мягкой матовой глазурью. Каждая чуть отличается по оттенку — это ручная работа.', cartUrl: null, keywords: 'vase,ceramics' },
+  { title: 'Льняная салфетка',        price: 890,  category: 'textile',  description: 'Салфетка из натурального льна с обработанным краем. Хорошо переносит стирку и со временем мягче.', cartUrl: null, keywords: 'linen,napkin' },
+  { title: 'Сумка-шопер из хлопка',   price: 1500, category: 'clothing', description: 'Плотный хлопковый шопер с длинными ручками. Выдерживает книги, ноутбук и продукты.',           cartUrl: null, keywords: 'bag,cotton' },
+  { title: 'Кружка «Окколо»',         price: 1200, category: 'ceramics', description: 'Керамическая кружка на 300 мл с фирменной маркировкой. Удобно ложится в руку.',               cartUrl: null, keywords: 'mug,cup' },
+  { title: 'Браслет «Жемчуг»',        price: 1800, category: 'jewelry',  description: 'Тонкий браслет с пресноводным жемчугом и латунной фурнитурой. Регулируемая длина.',           cartUrl: null, keywords: 'bracelet,pearl' },
+  { title: 'Дорожка на стол',         price: 2400, category: 'textile',  description: 'Тканая дорожка длиной 140 см в нейтральной палитре. Подходит и под праздничную сервировку.',  cartUrl: null, keywords: 'fabric,table' },
+  { title: 'Рубашка льняная',         price: 4500, category: 'clothing', description: 'Свободного кроя, без подкладки. Лён мягко мнётся и держит форму. Размеры S–XL.',              cartUrl: null, keywords: 'shirt,linen' },
+  { title: 'Набор мисок',             price: 2800, category: 'ceramics', description: 'Три миски разного диаметра в одной палитре. Подходят для духовки и микроволновки.',          cartUrl: null, keywords: 'bowl,ceramics' },
+  { title: 'Серьги «Солнце»',         price: 1650, category: 'jewelry',  description: 'Латунные серьги с лёгкой полировкой. Дужка из медицинской стали — комфортно весь день.',     cartUrl: null, keywords: 'earrings,brass' },
+  { title: 'Шарф шерстяной',          price: 2200, category: 'textile',  description: 'Тонкая шерсть мериноса, мягкая бахрома по краям. Размер 30×180 см.',                          cartUrl: null, keywords: 'scarf,wool' },
+  { title: 'Тарелка десертная',       price: 1400, category: 'ceramics', description: 'Плоская керамическая тарелка диаметром 18 см с лёгкой деформацией края.',                    cartUrl: null, keywords: 'plate,ceramics' },
+  { title: 'Колье на цепочке',        price: 2400, category: 'jewelry',  description: 'Тонкая цепочка с латунной подвеской, длина 50 см. Подходит под футболки и водолазки.',       cartUrl: null, keywords: 'necklace,chain' },
+  { title: 'Платок шёлковый',         price: 3100, category: 'textile',  description: 'Натуральный шёлк, ручная роспись горячим батиком. Каждый платок уникален.',                  cartUrl: null, keywords: 'silk,scarf' },
+  { title: 'Худи унисекс',            price: 5200, category: 'clothing', description: 'Плотный хлопковый футер, прямой крой, карман-кенгуру. Печать «Окколо» на спине.',            cartUrl: null, keywords: 'hoodie,sweatshirt' },
+  { title: 'Подсвечник',              price: 1600, category: 'ceramics', description: 'Керамический подсвечник для свечи-таблетки. Глазурь матовая, под цвет стола.',               cartUrl: null, keywords: 'candle,holder' },
+  { title: 'Платье льняное',          price: 5800, category: 'clothing', description: 'Прямого силуэта с боковыми разрезами. Размер регулируется поясом, длина миди.',              cartUrl: null, keywords: 'dress,linen' },
+  { title: 'Кольцо «Капля»',          price: 2300, category: 'jewelry',  description: 'Тонкое латунное кольцо с минималистичной каплевидной формой. Размеры 16–19.',                cartUrl: null, keywords: 'ring,minimal' },
+  { title: 'Скатерть «Дюна»',         price: 3700, category: 'textile',  description: 'Полульняная скатерть 140×200 см с лёгкой фактурой полотна. Песочный оттенок.',               cartUrl: null, keywords: 'tablecloth,linen' },
+  { title: 'Тарелка для пасты',       price: 1900, category: 'ceramics', description: 'Глубокая тарелка с расширенным краем. Стильно смотрится с любыми соусами.',                 cartUrl: null, keywords: 'plate,pasta' },
+  { title: 'Футболка хлопковая',      price: 2400, category: 'clothing', description: 'Базовая футболка из плотного хлопка. Прямой крой, оверсайз посадка.',                       cartUrl: null, keywords: 'tshirt,cotton' },
+  { title: 'Подушка декоративная',    price: 2100, category: 'textile',  description: 'Чехол из плотного хлопка 45×45 см. Внутренник из микрофибры в комплекте.',                   cartUrl: null, keywords: 'pillow,cushion' },
+  { title: 'Чайник заварочный',       price: 4200, category: 'ceramics', description: 'Объём 600 мл, со встроенным керамическим ситом. Удобный носик не капает.',                  cartUrl: null, keywords: 'teapot,tea' },
+  { title: 'Серьги-гвоздики',         price: 1300, category: 'jewelry',  description: 'Латунные гвоздики геометрической формы. Лёгкие, незаметные в ушах.',                        cartUrl: null, keywords: 'earrings,studs' },
+  { title: 'Сумка через плечо',       price: 3400, category: 'clothing', description: 'Льняной кросс-боди с регулируемым ремнём и внутренним кармашком на молнии.',                cartUrl: null, keywords: 'bag,crossbody' },
+  { title: 'Полотенце вафельное',     price: 1100, category: 'textile',  description: 'Хлопковое вафельное полотенце 50×70 см. Быстро сохнет, не пушится.',                        cartUrl: null, keywords: 'towel,kitchen' },
+  { title: 'Кашпо керамическое',      price: 2700, category: 'ceramics', description: 'Подходит для горшков диаметром до 14 см. Дренажные отверстия и поддон в комплекте.',         cartUrl: null, keywords: 'planter,plant' },
+  { title: 'Брошь «Лист»',            price: 1750, category: 'jewelry',  description: 'Латунная брошь в форме листа, ручная гравировка прожилок.',                                  cartUrl: null, keywords: 'brooch,nature' },
+  { title: 'Юбка миди',               price: 4900, category: 'clothing', description: 'Юбка-полусолнце из плотного льна. Высокая посадка, потайная молния.',                       cartUrl: null, keywords: 'skirt,linen' },
+  { title: 'Чехол для ноутбука',      price: 2900, category: 'textile',  description: 'Тканый чехол для 13–14" ноутбука. Мягкий ворс внутри, магнитный клапан снаружи.',           cartUrl: null, keywords: 'laptop,case' },
+  { title: 'Кружка-эспрессо',         price: 950,  category: 'ceramics', description: 'Маленькая чашка на 70 мл с блюдцем. Подходит под двойной эспрессо.',                       cartUrl: null, keywords: 'espresso,cup' },
+  { title: 'Серьги-кольца',           price: 1450, category: 'jewelry',  description: 'Латунные кольца-серьги диаметром 25 мм. Лёгкий объём, не оттягивают мочку.',                cartUrl: null, keywords: 'earrings,hoops' },
 ];
 
-async function fetchImageToTmp(seedKey: string, width = 1200, height = 900): Promise<string | null> {
-  try {
-    const url = `https://picsum.photos/seed/${encodeURIComponent(seedKey)}/${width}/${height}`;
-    const res = await fetch(url, { redirect: 'follow' });
-    if (!res.ok) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    const filepath = path.join(os.tmpdir(), `seed-${seedKey}-${Date.now()}.jpg`);
-    await fs.promises.writeFile(filepath, buf);
-    return filepath;
-  } catch {
-    return null;
+const PRODUCTS: ProductSeed[] = PRODUCT_TEMPLATES.map((p, i) => ({ ...p, lock: 3000 + i }));
+
+async function fetchImageToTmp(keywords: string, lock: number, w = 1200, h = 900): Promise<string | null> {
+  // loremflickr.com отдаёт реальные фото по ключевым словам; lock даёт детерминированный кадр
+  const url = `https://loremflickr.com/${w}/${h}/${encodeURIComponent(keywords)}?lock=${lock}`;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000) });
+      if (!res.ok) continue;
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf.length < 1024) continue; // защита от пустых/ошибочных ответов
+      const filepath = path.join(os.tmpdir(), `seed-${lock}-${Date.now()}.jpg`);
+      await fs.promises.writeFile(filepath, buf);
+      return filepath;
+    } catch {
+      // retry
+    }
   }
+  return null;
 }
 
-async function uploadImage(
-  strapi: Core.Strapi,
-  filepath: string,
-  displayName: string,
-): Promise<number | null> {
+async function uploadImage(strapi: Core.Strapi, filepath: string, displayName: string): Promise<number | null> {
   try {
     const stat = await fs.promises.stat(filepath);
-    const uploaded = await strapi
-      .plugin('upload')
-      .service('upload')
-      .upload({
-        data: { fileInfo: { name: displayName, alternativeText: displayName } },
-        files: {
-          filepath,
-          originalFilename: path.basename(filepath),
-          mimetype: 'image/jpeg',
-          size: stat.size,
-        },
-      });
+    const uploaded = await strapi.plugin('upload').service('upload').upload({
+      data: { fileInfo: { name: displayName, alternativeText: displayName } },
+      files: {
+        filepath,
+        originalFilename: path.basename(filepath),
+        mimetype: 'image/jpeg',
+        size: stat.size,
+      },
+    });
     const file = Array.isArray(uploaded) ? uploaded[0] : uploaded;
     return file?.id ?? null;
   } catch (err) {
@@ -366,14 +182,21 @@ async function uploadImage(
   }
 }
 
-async function getImageMediaId(
-  strapi: Core.Strapi,
-  seedKey: string,
-  displayName: string,
-): Promise<number | null> {
-  const tmp = await fetchImageToTmp(seedKey);
-  if (!tmp) return null;
+async function getImageMediaId(strapi: Core.Strapi, keywords: string, lock: number, displayName: string): Promise<number | null> {
+  const tmp = await fetchImageToTmp(keywords, lock);
+  if (!tmp) {
+    strapi.log.warn(`seed: image fetch failed for ${displayName} (loremflickr ${keywords} lock=${lock})`);
+    return null;
+  }
   return uploadImage(strapi, tmp, displayName);
+}
+
+async function clearCollection(strapi: Core.Strapi, uid: any, label: string) {
+  const items = await strapi.entityService.findMany(uid, { fields: ['id'] } as any) as Array<{ id: number }>;
+  for (const item of items) {
+    await strapi.entityService.delete(uid, item.id);
+  }
+  strapi.log.info(`seed: cleared ${items.length} ${label}`);
 }
 
 async function seedDirections(strapi: Core.Strapi) {
@@ -383,7 +206,7 @@ async function seedDirections(strapi: Core.Strapi) {
     return;
   }
   for (const item of DIRECTIONS) {
-    const imageId = await getImageMediaId(strapi, item.picsumSeed, item.title);
+    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title);
     await strapi.entityService.create('api::direction.direction', {
       data: {
         title: item.title,
@@ -392,7 +215,7 @@ async function seedDirections(strapi: Core.Strapi) {
         publishedAt: new Date(),
       },
     });
-    strapi.log.info(`seed: direction "${item.title}" created`);
+    strapi.log.info(`seed: direction "${item.title}" created (img=${imageId ?? 'none'})`);
   }
 }
 
@@ -403,7 +226,7 @@ async function seedEvents(strapi: Core.Strapi) {
     return;
   }
   for (const item of EVENTS) {
-    const imageId = await getImageMediaId(strapi, item.picsumSeed, item.title);
+    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title);
     await strapi.entityService.create('api::event.event', {
       data: {
         title: item.title,
@@ -419,7 +242,7 @@ async function seedEvents(strapi: Core.Strapi) {
         publishedAt: new Date(),
       },
     });
-    strapi.log.info(`seed: event "${item.title}" created`);
+    strapi.log.info(`seed: event "${item.title}" created (img=${imageId ?? 'none'})`);
   }
 }
 
@@ -429,10 +252,13 @@ async function seedProducts(strapi: Core.Strapi) {
     strapi.log.info(`seed: products already populated (${existing}), skip`);
     return;
   }
+  let created = 0;
+  let skipped = 0;
   for (const item of PRODUCTS) {
-    const imageId = await getImageMediaId(strapi, item.picsumSeed, item.title);
+    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title);
     if (!imageId) {
       strapi.log.warn(`seed: product "${item.title}" skipped — no image (image is required)`);
+      skipped += 1;
       continue;
     }
     await strapi.entityService.create('api::product.product', {
@@ -446,8 +272,10 @@ async function seedProducts(strapi: Core.Strapi) {
         publishedAt: new Date(),
       },
     });
-    strapi.log.info(`seed: product "${item.title}" created`);
+    created += 1;
+    strapi.log.info(`seed: product "${item.title}" created (img=${imageId})`);
   }
+  strapi.log.info(`seed: products done — created=${created}, skipped=${skipped}`);
 }
 
 async function seedShowroom(strapi: Core.Strapi) {
@@ -456,17 +284,24 @@ async function seedShowroom(strapi: Core.Strapi) {
     strapi.log.info(`seed: showroom already populated (${existing}), skip`);
     return;
   }
-  const imageId = await getImageMediaId(strapi, 'okkolo-showroom-hero', 'Шоурум Окколо');
+  const imageId = await getImageMediaId(strapi, 'showroom,interior', 4001, 'Шоурум Окколо');
   await strapi.entityService.create('api::showroom.showroom', {
     data: {
       heroImage: imageId ?? undefined,
       publishedAt: new Date(),
     },
   });
-  strapi.log.info('seed: showroom entry created');
+  strapi.log.info(`seed: showroom entry created (img=${imageId ?? 'none'})`);
 }
 
 export async function runBootstrapSeed(strapi: Core.Strapi) {
+  if (process.env.SEED_FORCE === 'true') {
+    strapi.log.warn('seed: SEED_FORCE=true — wiping all directions/events/products/showroom before reseed');
+    await clearCollection(strapi, 'api::direction.direction', 'directions');
+    await clearCollection(strapi, 'api::event.event', 'events');
+    await clearCollection(strapi, 'api::product.product', 'products');
+    await clearCollection(strapi, 'api::showroom.showroom', 'showroom');
+  }
   await seedDirections(strapi);
   await seedEvents(strapi);
   await seedProducts(strapi);
