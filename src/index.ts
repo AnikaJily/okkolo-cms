@@ -1,12 +1,16 @@
 import type { Core } from '@strapi/strapi';
+import { runBootstrapSeed } from './bootstrap-seed';
 
 const PUBLIC_READ_UIDS = [
   'api::direction.direction',
+  'api::event.event',
+  'api::product.product',
+  'api::showroom.showroom',
 ];
 
 const PUBLIC_CREATE_UIDS: string[] = [
-  // 'api::event-registration.event-registration',
-  // 'api::order.order',
+  'api::event-registration.event-registration',
+  'api::order.order',
 ];
 
 async function ensurePublicPermissions(strapi: Core.Strapi) {
@@ -42,6 +46,14 @@ export default {
       await ensurePublicPermissions(strapi);
     } catch (err) {
       strapi.log.error('bootstrap: failed to ensure public permissions', err);
+    }
+
+    if (process.env.SEED_ON_BOOT !== 'false') {
+      try {
+        await runBootstrapSeed(strapi);
+      } catch (err) {
+        strapi.log.error('bootstrap: seed failed', err);
+      }
     }
   },
 };
