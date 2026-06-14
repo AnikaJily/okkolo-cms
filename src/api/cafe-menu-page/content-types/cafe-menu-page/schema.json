@@ -1,0 +1,38 @@
+{
+  "kind": "singleType",
+  "collectionName": "cafe_menu_pages",
+  "info": {
+    "singularName": "cafe-menu-page",
+    "pluralName": "cafe-menu-pages",
+    "displayName": "Меню кофейни — постеры",
+    "description": "Фото печатных постеров меню (основное и сезонное) и общая сноска под меню. Позиции редактируются отдельно — в коллекции «Позиции меню кофейни»."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "mainPosterImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "mainPosterAlt": {
+      "type": "string",
+      "description": "Альтернативный текст для скринридеров. Опишите, что на фото."
+    },
+    "summerPosterImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "summerPosterAlt": {
+      "type": "string",
+      "description": "Альтернативный текст для скринридеров. Опишите, что на фото."
+    },
+    "footnote": {
+      "type": "string",
+      "description": "Сноска под обоими меню, например «альтернативное молоко +50/70 ₽»."
+    }
+  }
+}

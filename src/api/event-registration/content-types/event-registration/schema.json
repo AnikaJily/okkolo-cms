@@ -35,8 +35,10 @@
       "type": "enumeration",
       "enum": [
         "pending",
-        " not_required"
-      ]
+        "not_required",
+        "paid"
+      ],
+      "description": "pending — ждёт оплаты, not_required — оплата не нужна (бесплатное событие), paid — оплачено."
     }
   }
 }

@@ -12,7 +12,8 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "price": {
       "type": "integer"
@@ -52,6 +53,11 @@
         "videos",
         "audios"
       ]
+    },
+    "isAvailable": {
+      "type": "boolean",
+      "default": true,
+      "description": "Снять галочку, чтобы временно скрыть товар (например, нет в наличии). Удалять не обязательно."
     }
   }
 }

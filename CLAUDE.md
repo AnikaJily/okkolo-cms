@@ -54,12 +54,17 @@ types/generated/      # авто-генеренные .d.ts (контент-ти
 
 | UID | displayName | Кратко | Спец. поля |
 |---|---|---|---|
-| `api::direction.direction` | Направления | Карточки разделов главной (Кофейня, Мастерские, Шоурум, Мероприятия). | `title`, `description`, `image` (single media). **Поля `href` в схеме нет**, но фронт его читает (см. ниже). |
-| `api::event.event` | Мероприятия | Список ивентов для `/events`. | `title`, `date`, `description`, `photo`, `isPaid`, **`Price` (с заглавной P)**, `paymentUrl`, `type` enum (`музыка`, `мастер-класс`, `лекция`, `стенд-ап`), `spotsTotal`, `spotsTaken`. |
-| `api::event-registration.event-registration` | Регистрация на мероприятия | Заявки от посетителей. | `eventTitle`, `name`(req), `phone`(req), `email`, `comment`, `eventId`, `paymentStatus` enum (`pending`, **`" not_required"` с ведущим пробелом!**). |
+| `api::direction.direction` | Направления | Карточки разделов главной (Кофейня, Мастерские, Шоурум, Мероприятия). | `title`(req), `description`, `href` (string, опц.), `image`. |
+| `api::event.event` | Мероприятия | Список ивентов для `/events`. | `title`(req), `slug`(uid из title), `date`, `description`, `photo`, `gallery`(multi), `isPaid`(default false), `price`, `paymentUrl`, `type` enum (`музыка`, `мастер-класс`, `лекция`, `стенд-ап`), `spotsTotal`, `spotsTaken`. |
+| `api::event-registration.event-registration` | Регистрация на мероприятия | Заявки от посетителей. | `eventTitle`, `name`(req), `phone`(req), `email`, `comment`, `eventId`, `paymentStatus` enum (`pending`, `not_required`, `paid`). |
 | `api::order.order` | Заказ | Чеки шоурума. | `customerName`(req), `phone`(req), `email`, `totalPrice`, `items`(json), `orderStatus` enum (`pending`,`completed`), `fulfillmentType` enum (`pickup`,`delivery`), `city`, `address`, `deliveryComment`. |
-| `api::product.product` | Товары | Каталог шоурума. | `title`, `price`, `category` enum (`ceramics`,`clothing`,`jewelry`,`textile`), `image`(req, single), `gallery`(multi), `cartUrl`, `description`. |
+| `api::product.product` | Товары | Каталог шоурума. | `title`(req), `price`, `category` enum (`ceramics`,`clothing`,`jewelry`,`textile`), `image`(req, single), `gallery`(multi), `cartUrl`, `description`, `isAvailable` (default true). |
 | `api::showroom.showroom` | Шоурум | Сейчас singleton-подобная коллекция с одним полем `heroImage`. Используется как источник hero-картинки страницы `/showroom`. |
+| `api::cafe-menu-page.cafe-menu-page` | Меню кофейни — постеры | **Single Type.** Фотографии печатных меню (основное и сезонное) и общая сноска под меню. Поля: `mainPosterImage`+`mainPosterAlt`, `summerPosterImage`+`summerPosterAlt`, `footnote`. |
+| `api::menu-item.menu-item` | Позиции меню кофейни | Список напитков/топингов. Поля: `name`(req), `volume`, `price`(req, строкой), `note`, `category` enum (`coffee`/`tea`/`signature`/`topping`/`cold`/`lemonade`), `season` enum (`main`/`summer`/`winter`, default `main`), `order` (int, default 0), `isAvailable` (default true). |
+| `api::monthly-report.monthly-report` | Ежемесячные отчёты | Поля: `month` integer 1–12 (req), `year` (req), `pdf`(req, files), `summary` (опц.). |
+| `api::annual-report.annual-report` | Годовые отчёты | Поля: `year`(req), `kind` enum (`content`/`finance`/`nko-activity`/`spending`)(req), `pdf`(req, files), `note` (опц.). |
+| `api::legal-document.legal-document` | Документы фонда | Учредительные/реквизиты/политика. Поля: `title`(req), `category` enum (`requisites`/`foundation`/`privacy`)(req), `pdf`(req, files), `order` (int). |
 
 Фронт (`okkolo/src/lib/strapi.ts`) обращается одновременно к `/api/showrooms` (коллекция) **и** к `/api/showroom` (single type) — фоллбэк на случай, если шоурум переведут в Single Type. Сейчас в CMS он коллекция.
 
@@ -67,10 +72,10 @@ types/generated/      # авто-генеренные .d.ts (контент-ти
 
 `src/index.ts` при старте Strapi создаёт permission'ы для роли `public`:
 
-- `PUBLIC_READ_UIDS = ['api::direction.direction']` → публично доступны `find` и `findOne`.
-- `PUBLIC_CREATE_UIDS` пуст (строки про `event-registration.create` и `order.create` закомментированы) → **POST на эти эндпоинты пока требует авторизации**. Если фронт начнёт получать 403 на регистрациях/заказах — раскомментировать UID-ы и перезапустить (`pm2 restart okkolo-cms --update-env`).
+- `PUBLIC_READ_UIDS` — `direction`, `event`, `product`, `showroom`, `cafe-menu-page`, `menu-item`, `monthly-report`, `annual-report`, `legal-document` → `find` + `findOne` для всех.
+- `PUBLIC_CREATE_UIDS` — `event-registration`, `order` → POST с лендинга разрешён.
 
-Логика идемпотентная: перед `create` проверяет существование permission'а — повторный bootstrap не дублирует записи. Любые остальные публичные доступы (на events, products, showroom) сейчас выставлены **вручную через админку** — в коде их нет. Если разворачиваешь свежий инстанс — повторить через UI или дописать UID в `PUBLIC_READ_UIDS`.
+Логика идемпотентная: перед `create` проверяет существование permission'а — повторный bootstrap не дублирует записи. Если поднимаешь свежий инстанс — все нужные доступы выставит сам bootstrap; админка не требуется.
 
 ### Middleware и CORS
 
@@ -81,9 +86,14 @@ types/generated/      # авто-генеренные .d.ts (контент-ти
 Лендинг ходит сюда напрямую через `fetch` без SDK:
 
 - `GET /api/directions?populate=image`
-- `GET /api/events?populate=photo&sort=date:asc`
-- `GET /api/products?populate[image]=true&populate[gallery]=true&sort=title:asc`
+- `GET /api/events?populate[photo]=true&populate[gallery]=true&sort=date:asc`
+- `GET /api/products?populate[image]=true&populate[gallery]=true&sort=title:asc&filters[isAvailable][$eq]=true`
 - `GET /api/showrooms?populate=heroImage` (с фоллбэком на `GET /api/showroom?populate=hero`)
+- `GET /api/cafe-menu-page?populate=*` (Single Type — фото меню и сноска)
+- `GET /api/menu-items?filters[isAvailable][$eq]=true&sort=order:asc` (отфильтровать по `season` и/или `category` на стороне фронта)
+- `GET /api/monthly-reports?populate=pdf&sort[0]=year:desc&sort[1]=month:desc`
+- `GET /api/annual-reports?populate=pdf&sort[0]=year:desc`
+- `GET /api/legal-documents?populate=pdf&sort=order:asc`
 - `POST /api/event-registrations` (тело: `{ data: { eventTitle, name, phone, email?, comment?, eventId, paymentStatus } }`)
 - `POST /api/orders` (тело: `{ data: { customerName, phone, email?, totalPrice, items: [...], orderStatus, fulfillmentType, city?, address?, deliveryComment? } }`)
 
@@ -91,10 +101,8 @@ types/generated/      # авто-генеренные .d.ts (контент-ти
 
 ## Подводные камни
 
-- **`event.Price` с заглавной буквы** — в схеме `"Price"`, а фронт читает `price` (строчная). Сейчас фронт берёт цену из своего поля и одно из них рассинхронено: при правке любой стороны проверь обе. Корректнее переименовать атрибут в `price` (миграция Strapi через UI) и обновить `StrapiEventItem`.
-- **`event-registration.paymentStatus` enum содержит `" not_required"` с ведущим пробелом.** Это не опечатка в этом файле — это реально в `schema.json`. Фронт же шлёт `'not_required'` без пробела (см. `EventRegistrationInput`). До фикса значения не совпадут — заявки сохранятся с `paymentStatus = null`. Чинить через админку → Content-Type Builder → удалить пробел в enum.
-- **Direction.href не существует в схеме**, хотя `okkolo/src/lib/strapi.ts` его читает и `okkolo/src/lib/directions.ts::resolveDirectionHref` пытается на него опереться. Сейчас работает за счёт того, что для известных направлений href вычисляется из заголовка (`isShowroomDirection`, `isEventsDirection` и т.д.). Если хочется ручного управления — добавить string-атрибут `href` в Direction.
-- **Permissions для `events`/`products`/`showroom`/`POST regs/orders` не в коде.** Свежий инстанс по умолчанию вернёт 403 на эти ручки. Либо включи их в админке (Settings → Roles → Public), либо допиши UID-ы в `src/index.ts`. Через UI — быстрее, через код — воспроизводимо.
+- **Миграция полей `event.Price → price` и `event-registration.paymentStatus`** уже сделана в схемах. На локалке (SQLite) данные после первого `npm run develop` пересоздадутся (если SEED_FORCE=true) или просто старые столбцы исчезнут. **Перед деплоем на прод** — обязательно `pg_dump` (см. README.md → «Бэкап Postgres»). После деплоя `event.Price` исчезает из БД, заявки с `paymentStatus = ' not_required'` (с пробелом) станут невалидными — их можно либо удалить, либо обновить SQL-апдейтом.
+- **Frontend ещё не переключён на новые поля.** `okkolo/src/lib/strapi.ts` сейчас читает `Price` (через `StrapiEventItem`), а у `event-registration` шлёт `paymentStatus: 'not_required'` (это уже совпадает с новым enum). При первом релизе CMS сразу обновить фронт: `Price` → `price`, добавить опору на `slug`/`gallery`/`isAvailable`, использовать `direction.href` напрямую.
 - **`public/uploads` в `.gitignore`.** Аплоады локалки и прода не пересекаются. Перенос медиа = ручной rsync `~/apps/cms/public/uploads` или дамп через Strapi Transfer.
 - **`types/generated/`** регенерится при каждом `develop`/`build`. Если git показывает диффы в этих файлах после старта — это норма; не правь руками, правь схемы.
 

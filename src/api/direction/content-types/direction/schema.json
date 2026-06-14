@@ -12,10 +12,15 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "description": {
       "type": "text"
+    },
+    "href": {
+      "type": "string",
+      "description": "Куда ведёт карточка. Например: /cafe, /workshops, /showroom, /events. Если не задано — фронт попробует определить по заголовку."
     },
     "image": {
       "type": "media",

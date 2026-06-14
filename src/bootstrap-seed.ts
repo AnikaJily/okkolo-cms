@@ -18,7 +18,7 @@ interface EventSeed {
   date: string;
   description: string;
   isPaid: boolean;
-  Price: number | null;
+  price: number | null;
   paymentUrl: string | null;
   type: EventType;
   spotsTotal: number;
@@ -35,6 +35,18 @@ interface ProductSeed {
   cartUrl: string | null;
   keywords: string;
   lock: number;
+}
+
+type MenuCategory = 'coffee' | 'tea' | 'signature' | 'topping' | 'cold' | 'lemonade';
+type MenuSeason = 'main' | 'summer' | 'winter';
+
+interface MenuItemSeed {
+  name: string;
+  volume?: string;
+  price: string;
+  note?: string;
+  category: MenuCategory;
+  season: MenuSeason;
 }
 
 const DIRECTIONS: DirectionSeed[] = [
@@ -58,50 +70,50 @@ function dayAt(daysFromNow: number, hours: number, minutes = 0): string {
 // 10 дней, по 2-4 события на день, разные типы и темы
 const EVENTS: EventSeed[] = [
   // День 1
-  { title: 'Вечер живого джаза',                       date: dayAt(1, 19, 0),  description: 'Тёплый вечер с трио из Краснодара: стандарты Эллингтона и пара современных номеров. Бар работает весь вечер.', isPaid: false, Price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 40, spotsTaken: 12, keywords: 'jazz,concert',     lock: 2001 },
-  { title: 'Утренний фриланс-завтрак',                 date: dayAt(1, 9, 30),  description: 'Открытое утро для тех, кто работает из кафе: розетки, тихий стол и кофе по специальной цене.',                isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 20, spotsTaken: 7,  keywords: 'coffee,laptop',    lock: 2002 },
+  { title: 'Вечер живого джаза',                       date: dayAt(1, 19, 0),  description: 'Тёплый вечер с трио из Краснодара: стандарты Эллингтона и пара современных номеров. Бар работает весь вечер.', isPaid: false, price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 40, spotsTaken: 12, keywords: 'jazz,concert',     lock: 2001 },
+  { title: 'Утренний фриланс-завтрак',                 date: dayAt(1, 9, 30),  description: 'Открытое утро для тех, кто работает из кафе: розетки, тихий стол и кофе по специальной цене.',                isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 20, spotsTaken: 7,  keywords: 'coffee,laptop',    lock: 2002 },
 
   // День 2
-  { title: 'Мастер-класс: первая кружка на гончарном круге', date: dayAt(2, 14, 0), description: 'Двухчасовая встреча: центрируем глину, лепим простую кружку. Подходит тем, кто впервые садится за круг.', isPaid: true, Price: 2400, paymentUrl: null, type: 'мастер-класс', spotsTotal: 7,  spotsTaken: 4,  keywords: 'pottery,clay',   lock: 2003 },
-  { title: 'Лекция: история инклюзивных пространств',  date: dayAt(2, 19, 30), description: 'Куратор «Окколо» рассказывает, как устроены инклюзивные кафе и почему это становится новой нормой.',          isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 35, spotsTaken: 18, keywords: 'lecture,books',   lock: 2004 },
-  { title: 'Стенд-ап вечер: открытый микрофон',        date: dayAt(2, 21, 0),  description: 'Открытый микрофон для местных комиков. 8 выступающих по 7 минут. Хотите выйти — напишите заранее.',           isPaid: true,  Price: 500,  paymentUrl: null, type: 'стенд-ап',     spotsTotal: 50, spotsTaken: 22, keywords: 'standup,microphone', lock: 2005 },
+  { title: 'Мастер-класс: первая кружка на гончарном круге', date: dayAt(2, 14, 0), description: 'Двухчасовая встреча: центрируем глину, лепим простую кружку. Подходит тем, кто впервые садится за круг.', isPaid: true, price: 2400, paymentUrl: null, type: 'мастер-класс', spotsTotal: 7,  spotsTaken: 4,  keywords: 'pottery,clay',   lock: 2003 },
+  { title: 'Лекция: история инклюзивных пространств',  date: dayAt(2, 19, 30), description: 'Куратор «Окколо» рассказывает, как устроены инклюзивные кафе и почему это становится новой нормой.',          isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 35, spotsTaken: 18, keywords: 'lecture,books',   lock: 2004 },
+  { title: 'Стенд-ап вечер: открытый микрофон',        date: dayAt(2, 21, 0),  description: 'Открытый микрофон для местных комиков. 8 выступающих по 7 минут. Хотите выйти — напишите заранее.',           isPaid: true,  price: 500,  paymentUrl: null, type: 'стенд-ап',     spotsTotal: 50, spotsTaken: 22, keywords: 'standup,microphone', lock: 2005 },
 
   // День 3
-  { title: 'Книжный клуб: «Маленький принц»',          date: dayAt(3, 18, 30), description: 'Разбираем главы, делимся впечатлениями, пьём чай. Можно прийти даже если перечитали по диагонали.',           isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 25, spotsTaken: 8,  keywords: 'book,reading',     lock: 2006 },
-  { title: 'Воркшоп по линогравюре',                   date: dayAt(3, 17, 0),  description: 'Два часа практики: эскиз → перенос на линолеум → пробный оттиск. Уносите серию открыток собственной печати.', isPaid: true,  Price: 1900, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 3,  keywords: 'print,linocut',    lock: 2007 },
+  { title: 'Книжный клуб: «Маленький принц»',          date: dayAt(3, 18, 30), description: 'Разбираем главы, делимся впечатлениями, пьём чай. Можно прийти даже если перечитали по диагонали.',           isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 25, spotsTaken: 8,  keywords: 'book,reading',     lock: 2006 },
+  { title: 'Воркшоп по линогравюре',                   date: dayAt(3, 17, 0),  description: 'Два часа практики: эскиз → перенос на линолеум → пробный оттиск. Уносите серию открыток собственной печати.', isPaid: true,  price: 1900, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 3,  keywords: 'print,linocut',    lock: 2007 },
 
   // День 4
-  { title: 'Акустический вечер: песни под гитару',     date: dayAt(4, 19, 0),  description: 'Дуэт гитаристов, кавер-программа и пара авторских песен. Свет приглушённый, можно сидеть на подушках.',     isPaid: false, Price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 40, spotsTaken: 17, keywords: 'guitar,acoustic',  lock: 2008 },
-  { title: 'Мастер-класс: текстильная аппликация',     date: dayAt(4, 12, 0),  description: 'Делаем небольшое настенное панно из лоскутов: подбор палитры, раскладка, шов через край. Материалы включены.', isPaid: true, Price: 1600, paymentUrl: null, type: 'мастер-класс', spotsTotal: 8,  spotsTaken: 5,  keywords: 'fabric,sewing',  lock: 2009 },
-  { title: 'Лекция: «Цвет в интерьере»',               date: dayAt(4, 19, 30), description: 'Дизайнер-колорист объясняет, как работает цвет в маленькой квартире и какие сочетания не утомляют глаз.',      isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 30, spotsTaken: 11, keywords: 'color,interior',   lock: 2010 },
+  { title: 'Акустический вечер: песни под гитару',     date: dayAt(4, 19, 0),  description: 'Дуэт гитаристов, кавер-программа и пара авторских песен. Свет приглушённый, можно сидеть на подушках.',     isPaid: false, price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 40, spotsTaken: 17, keywords: 'guitar,acoustic',  lock: 2008 },
+  { title: 'Мастер-класс: текстильная аппликация',     date: dayAt(4, 12, 0),  description: 'Делаем небольшое настенное панно из лоскутов: подбор палитры, раскладка, шов через край. Материалы включены.', isPaid: true, price: 1600, paymentUrl: null, type: 'мастер-класс', spotsTotal: 8,  spotsTaken: 5,  keywords: 'fabric,sewing',  lock: 2009 },
+  { title: 'Лекция: «Цвет в интерьере»',               date: dayAt(4, 19, 30), description: 'Дизайнер-колорист объясняет, как работает цвет в маленькой квартире и какие сочетания не утомляют глаз.',      isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 30, spotsTaken: 11, keywords: 'color,interior',   lock: 2010 },
 
   // День 5
-  { title: 'Стенд-ап: премьерная программа гостя',      date: dayAt(5, 20, 0),  description: 'Гастролирующий комик из Москвы привозит первый прогон новой программы. Билеты ограничены.',                   isPaid: true,  Price: 1200, paymentUrl: null, type: 'стенд-ап',     spotsTotal: 60, spotsTaken: 41, keywords: 'comedy,standup',   lock: 2011 },
-  { title: 'Мастер-класс по ювелирному литью',         date: dayAt(5, 16, 0),  description: 'Делаем восковую модель и отливаем латунный кулон. Финишинг и подгонка — на месте.',                            isPaid: true,  Price: 3200, paymentUrl: null, type: 'мастер-класс', spotsTotal: 5,  spotsTaken: 2,  keywords: 'jewelry,silver',   lock: 2012 },
+  { title: 'Стенд-ап: премьерная программа гостя',      date: dayAt(5, 20, 0),  description: 'Гастролирующий комик из Москвы привозит первый прогон новой программы. Билеты ограничены.',                   isPaid: true,  price: 1200, paymentUrl: null, type: 'стенд-ап',     spotsTotal: 60, spotsTaken: 41, keywords: 'comedy,standup',   lock: 2011 },
+  { title: 'Мастер-класс по ювелирному литью',         date: dayAt(5, 16, 0),  description: 'Делаем восковую модель и отливаем латунный кулон. Финишинг и подгонка — на месте.',                            isPaid: true,  price: 3200, paymentUrl: null, type: 'мастер-класс', spotsTotal: 5,  spotsTaken: 2,  keywords: 'jewelry,silver',   lock: 2012 },
 
   // День 6
-  { title: 'Концерт: фолк-квартет «Стрепет»',          date: dayAt(6, 19, 30), description: 'Краснодарский фолк-квартет: голос, гитара, гадулка и перкуссия. Большая программа на полтора часа.',           isPaid: true,  Price: 800,  paymentUrl: null, type: 'музыка',       spotsTotal: 50, spotsTaken: 29, keywords: 'folk,band',        lock: 2013 },
-  { title: 'Книжный клуб: «Шум времени»',              date: dayAt(6, 18, 0),  description: 'Обсуждаем роман Барнса о Шостаковиче и эпохе. Без подготовки тоже можно — у нас есть краткое содержание.',     isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 20, spotsTaken: 9,  keywords: 'book,literature',  lock: 2014 },
-  { title: 'Воркшоп: блокнот ручного переплёта',       date: dayAt(6, 13, 0),  description: 'Сшиваем А5-блокнот на нитку и делаем мягкую обложку из крафта. Уносите 80 страниц своих будущих записей.',     isPaid: true,  Price: 1400, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 6,  keywords: 'book,binding',     lock: 2015 },
+  { title: 'Концерт: фолк-квартет «Стрепет»',          date: dayAt(6, 19, 30), description: 'Краснодарский фолк-квартет: голос, гитара, гадулка и перкуссия. Большая программа на полтора часа.',           isPaid: true,  price: 800,  paymentUrl: null, type: 'музыка',       spotsTotal: 50, spotsTaken: 29, keywords: 'folk,band',        lock: 2013 },
+  { title: 'Книжный клуб: «Шум времени»',              date: dayAt(6, 18, 0),  description: 'Обсуждаем роман Барнса о Шостаковиче и эпохе. Без подготовки тоже можно — у нас есть краткое содержание.',     isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 20, spotsTaken: 9,  keywords: 'book,literature',  lock: 2014 },
+  { title: 'Воркшоп: блокнот ручного переплёта',       date: dayAt(6, 13, 0),  description: 'Сшиваем А5-блокнот на нитку и делаем мягкую обложку из крафта. Уносите 80 страниц своих будущих записей.',     isPaid: true,  price: 1400, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 6,  keywords: 'book,binding',     lock: 2015 },
 
   // День 7
-  { title: 'Лекция: «Кофейная карта Краснодара»',      date: dayAt(7, 19, 0),  description: 'Обзор третьей волны от бариста «Окколо»: что пить дома, как читать упаковку, кому доверять обжарку.',          isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 35, spotsTaken: 14, keywords: 'coffee,espresso',  lock: 2016 },
-  { title: 'Открытая студия керамики',                 date: dayAt(7, 15, 0),  description: 'Свободный доступ к кругам и материалам. Наставник рядом, но программу выбираете сами.',                         isPaid: true,  Price: 900,  paymentUrl: null, type: 'мастер-класс', spotsTotal: 6,  spotsTaken: 2,  keywords: 'pottery,ceramics', lock: 2017 },
+  { title: 'Лекция: «Кофейная карта Краснодара»',      date: dayAt(7, 19, 0),  description: 'Обзор третьей волны от бариста «Окколо»: что пить дома, как читать упаковку, кому доверять обжарку.',          isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 35, spotsTaken: 14, keywords: 'coffee,espresso',  lock: 2016 },
+  { title: 'Открытая студия керамики',                 date: dayAt(7, 15, 0),  description: 'Свободный доступ к кругам и материалам. Наставник рядом, но программу выбираете сами.',                         isPaid: true,  price: 900,  paymentUrl: null, type: 'мастер-класс', spotsTotal: 6,  spotsTaken: 2,  keywords: 'pottery,ceramics', lock: 2017 },
 
   // День 8
-  { title: 'Винил-вечер: соул и фанк 70-х',            date: dayAt(8, 20, 0),  description: 'Резиденты крутят винил, а кухня собирает закусочный сет. Танцпол небольшой, но настоящий.',                    isPaid: false, Price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 50, spotsTaken: 23, keywords: 'vinyl,music',      lock: 2018 },
-  { title: 'Мастер-класс по батику',                   date: dayAt(8, 12, 0),  description: 'Узелковый и трафаретный батик на хлопке. Уносите готовый шарф или платок.',                                    isPaid: true,  Price: 2100, paymentUrl: null, type: 'мастер-класс', spotsTotal: 8,  spotsTaken: 4,  keywords: 'fabric,dye',       lock: 2019 },
-  { title: 'Лекция: «Доступная среда для бизнеса»',    date: dayAt(8, 18, 30), description: 'Что считается доступным, как это считать в деньгах и какие ошибки совершают чаще всего при ремонте кафе.',     isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 40, spotsTaken: 19, keywords: 'lecture,city',     lock: 2020 },
+  { title: 'Винил-вечер: соул и фанк 70-х',            date: dayAt(8, 20, 0),  description: 'Резиденты крутят винил, а кухня собирает закусочный сет. Танцпол небольшой, но настоящий.',                    isPaid: false, price: null, paymentUrl: null, type: 'музыка',       spotsTotal: 50, spotsTaken: 23, keywords: 'vinyl,music',      lock: 2018 },
+  { title: 'Мастер-класс по батику',                   date: dayAt(8, 12, 0),  description: 'Узелковый и трафаретный батик на хлопке. Уносите готовый шарф или платок.',                                    isPaid: true,  price: 2100, paymentUrl: null, type: 'мастер-класс', spotsTotal: 8,  spotsTaken: 4,  keywords: 'fabric,dye',       lock: 2019 },
+  { title: 'Лекция: «Доступная среда для бизнеса»',    date: dayAt(8, 18, 30), description: 'Что считается доступным, как это считать в деньгах и какие ошибки совершают чаще всего при ремонте кафе.',     isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 40, spotsTaken: 19, keywords: 'lecture,city',     lock: 2020 },
 
   // День 9
-  { title: 'Поэтический вечер: открытый микрофон',     date: dayAt(9, 19, 0),  description: 'Тёплая аудитория, мягкий свет и 5 минут на каждое выступление. Можно слушать, можно читать.',                  isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 30, spotsTaken: 10, keywords: 'poetry,reading',   lock: 2021 },
-  { title: 'Мастер-класс: серьги из латуни',           date: dayAt(9, 16, 0),  description: 'За два с половиной часа собираем пару серёг: эскиз, выпиловка, шлифовка, фурнитура.',                          isPaid: true,  Price: 2800, paymentUrl: null, type: 'мастер-класс', spotsTotal: 5,  spotsTaken: 3,  keywords: 'jewelry,brass',    lock: 2022 },
-  { title: 'Стенд-ап: женский лайнап',                 date: dayAt(9, 21, 0),  description: 'Четыре комикессы города в одной программе. Темы — городская жизнь, родители, дейтинг и работа.',                isPaid: true,  Price: 700,  paymentUrl: null, type: 'стенд-ап',     spotsTotal: 50, spotsTaken: 27, keywords: 'standup,comedy',   lock: 2023 },
+  { title: 'Поэтический вечер: открытый микрофон',     date: dayAt(9, 19, 0),  description: 'Тёплая аудитория, мягкий свет и 5 минут на каждое выступление. Можно слушать, можно читать.',                  isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 30, spotsTaken: 10, keywords: 'poetry,reading',   lock: 2021 },
+  { title: 'Мастер-класс: серьги из латуни',           date: dayAt(9, 16, 0),  description: 'За два с половиной часа собираем пару серёг: эскиз, выпиловка, шлифовка, фурнитура.',                          isPaid: true,  price: 2800, paymentUrl: null, type: 'мастер-класс', spotsTotal: 5,  spotsTaken: 3,  keywords: 'jewelry,brass',    lock: 2022 },
+  { title: 'Стенд-ап: женский лайнап',                 date: dayAt(9, 21, 0),  description: 'Четыре комикессы города в одной программе. Темы — городская жизнь, родители, дейтинг и работа.',                isPaid: true,  price: 700,  paymentUrl: null, type: 'стенд-ап',     spotsTotal: 50, spotsTaken: 27, keywords: 'standup,comedy',   lock: 2023 },
 
   // День 10
-  { title: 'Семейное утро с настольными играми',       date: dayAt(10, 11, 0), description: 'Подборка игр для разных возрастов, помощь ведущего и тёплые напитки. Приходите с детьми от 5 лет.',             isPaid: false, Price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 24, spotsTaken: 8,  keywords: 'board,games',      lock: 2024 },
-  { title: 'Концерт: камерный струнный квартет',       date: dayAt(10, 19, 0), description: 'Часовая программа из барокко и неоклассики. Места — кресла полукругом, как в маленьком зале.',                 isPaid: true,  Price: 1500, paymentUrl: null, type: 'музыка',       spotsTotal: 45, spotsTaken: 33, keywords: 'classical,string', lock: 2025 },
-  { title: 'Воркшоп по монотипии',                     date: dayAt(10, 15, 0), description: 'Печать с гладкой пластины: один оттиск — одно настроение. Уносите серию из 8–10 листов.',                       isPaid: true,  Price: 1700, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 5,  keywords: 'print,art',        lock: 2026 },
+  { title: 'Семейное утро с настольными играми',       date: dayAt(10, 11, 0), description: 'Подборка игр для разных возрастов, помощь ведущего и тёплые напитки. Приходите с детьми от 5 лет.',             isPaid: false, price: null, paymentUrl: null, type: 'лекция',       spotsTotal: 24, spotsTaken: 8,  keywords: 'board,games',      lock: 2024 },
+  { title: 'Концерт: камерный струнный квартет',       date: dayAt(10, 19, 0), description: 'Часовая программа из барокко и неоклассики. Места — кресла полукругом, как в маленьком зале.',                 isPaid: true,  price: 1500, paymentUrl: null, type: 'музыка',       spotsTotal: 45, spotsTaken: 33, keywords: 'classical,string', lock: 2025 },
+  { title: 'Воркшоп по монотипии',                     date: dayAt(10, 15, 0), description: 'Печать с гладкой пластины: один оттиск — одно настроение. Уносите серию из 8–10 листов.',                       isPaid: true,  price: 1700, paymentUrl: null, type: 'мастер-класс', spotsTotal: 10, spotsTaken: 5,  keywords: 'print,art',        lock: 2026 },
 ];
 
 const PRODUCT_TEMPLATES: Omit<ProductSeed, 'lock'>[] = [
@@ -141,6 +153,69 @@ const PRODUCT_TEMPLATES: Omit<ProductSeed, 'lock'>[] = [
 
 const PRODUCTS: ProductSeed[] = PRODUCT_TEMPLATES.map((p, i) => ({ ...p, lock: 3000 + i }));
 
+/**
+ * Меню кофейни. При первом запуске сидим как одно общее меню (season + category),
+ * чтобы заказчица могла прямо в админке убирать/добавлять позиции без программиста.
+ * Данные продублированы из okkolo-mobile/src/data/cafe.ts — это разовый импорт.
+ */
+const MENU_ITEMS: MenuItemSeed[] = [
+  { name: 'Эспрессо', price: '130 ₽', category: 'coffee', season: 'main' },
+  { name: 'Американо', price: '130 ₽', category: 'coffee', season: 'main' },
+  { name: 'Флэт уайт', volume: '0,2', price: '200 ₽', category: 'coffee', season: 'main' },
+  { name: 'Капучино', volume: '0,2 / 0,3', price: '200 / 220 ₽', category: 'coffee', season: 'main' },
+  { name: 'Латте', volume: '0,3', price: '200 ₽', category: 'coffee', season: 'main' },
+  { name: 'Раф', volume: '0,2 / 0,3', price: '230 / 260 ₽', category: 'coffee', season: 'main' },
+  { name: 'Какао', volume: '0,3', price: '220 ₽', category: 'coffee', season: 'main' },
+  { name: 'Черный чай', price: '140 ₽', category: 'tea', season: 'main' },
+  { name: 'Зеленый чай', price: '140 ₽', category: 'tea', season: 'main' },
+  { name: 'Черный чай с чабрецом', price: '150 ₽', category: 'tea', season: 'main' },
+  { name: 'Зеленый чай с жасмином', price: '150 ₽', category: 'tea', season: 'main' },
+  { name: 'Манговый улун', price: '150 ₽', category: 'tea', season: 'main' },
+  { name: 'Пряная груша', price: '280 ₽', category: 'tea', season: 'main' },
+  { name: 'Раф Баунти', volume: '0,2', price: '280 ₽', category: 'signature', season: 'main' },
+  { name: 'Латте Халва', volume: '0,3', price: '280 ₽', category: 'signature', season: 'main' },
+  { name: 'Маршмэллоу', price: '30 ₽', category: 'topping', season: 'main' },
+  { name: 'Сироп', price: '30 ₽', category: 'topping', season: 'main' },
+
+  { name: 'Айс-латте', note: 'молоко, эспрессо, лед', price: '220 ₽', category: 'cold', season: 'summer' },
+  { name: 'Айс-матча', note: 'молоко, матча, лед', price: '240 ₽', category: 'cold', season: 'summer' },
+  { name: 'Айс-арахисовый капучино', note: 'молоко, эспрессо, арахисовая заготовка, лед', price: '280 ₽', category: 'cold', season: 'summer' },
+  { name: 'Айс-латте «Банановое мороженое»', note: 'молоко, эспрессо, заготовка, лед', price: '280 ₽', category: 'cold', season: 'summer' },
+  { name: 'Бамбл', note: 'сок, эспрессо, лед; по желанию — сироп карамель', price: '250 ₽', category: 'cold', season: 'summer' },
+  { name: 'Бамбл-матча', note: 'сок, матча, лед; по желанию — сироп карамель', price: '250 ₽', category: 'cold', season: 'summer' },
+  { name: 'Киви — мята — виноград', price: '280 ₽', category: 'lemonade', season: 'summer' },
+  { name: 'Арбуз — дыня', price: '280 ₽', category: 'lemonade', season: 'summer' },
+  { name: 'Малина — имбирь', price: '280 ₽', category: 'lemonade', season: 'summer' },
+];
+
+/**
+ * Локальные исходники постеров меню. В seed используем именно файлы — они уже
+ * лежат в репо фронта и совпадают по содержанию с альтами в data/cafe.ts.
+ *
+ * Путь строим от process.cwd(), потому что Strapi всегда запускается из корня
+ * okkolo-cms/, и репо фронта живёт рядом — в `../okkolo-mobile/`.
+ */
+function menuPosterPath(filename: string): string {
+  return path.resolve(process.cwd(), '..', 'okkolo-mobile', 'src', 'assets', 'images', filename);
+}
+
+const MENU_POSTER_SOURCES = [
+  {
+    label: 'main',
+    path: menuPosterPath('menu_photo_1.jpg'),
+    alt: 'Печатное меню кофейни «Окколо»: кофе, чай, авторские напитки и топинги. Текстовая версия — под фотографией.',
+    displayName: 'Меню кофейни «Окколо» — основное',
+  },
+  {
+    label: 'summer',
+    path: menuPosterPath('menu_photo_2.jpg'),
+    alt: 'Печатное летнее меню кофейни «Окколо»: холодные кофейные напитки, матча и лимонады. Текстовая версия — под фотографией.',
+    displayName: 'Меню кофейни «Окколо» — летнее',
+  },
+] as const;
+
+const CAFE_MENU_FOOTNOTE = 'Дополнительно: альтернативное молоко +50/70 ₽.';
+
 async function fetchImageToTmp(keywords: string, lock: number, w = 1200, h = 900): Promise<string | null> {
   // loremflickr.com отдаёт реальные фото по ключевым словам; lock даёт детерминированный кадр
   const url = `https://loremflickr.com/${w}/${h}/${encodeURIComponent(keywords)}?lock=${lock}`;
@@ -179,6 +254,35 @@ async function uploadImage(strapi: Core.Strapi, filepath: string, displayName: s
     return null;
   } finally {
     fs.promises.unlink(filepath).catch(() => {});
+  }
+}
+
+/**
+ * Загружает уже существующий локальный файл (без копирования и удаления оригинала).
+ * Нужна для seed-а постеров меню, исходники которых лежат в репо фронта.
+ */
+async function uploadLocalImage(
+  strapi: Core.Strapi,
+  filepath: string,
+  displayName: string,
+  alt: string,
+): Promise<number | null> {
+  try {
+    const stat = await fs.promises.stat(filepath);
+    const uploaded = await strapi.plugin('upload').service('upload').upload({
+      data: { fileInfo: { name: displayName, alternativeText: alt } },
+      files: {
+        filepath,
+        originalFilename: path.basename(filepath),
+        mimetype: 'image/jpeg',
+        size: stat.size,
+      },
+    });
+    const file = Array.isArray(uploaded) ? uploaded[0] : uploaded;
+    return file?.id ?? null;
+  } catch (err) {
+    strapi.log.warn(`seed: local upload failed for ${displayName}: ${(err as Error).message}`);
+    return null;
   }
 }
 
@@ -234,7 +338,7 @@ async function seedEvents(strapi: Core.Strapi) {
         description: item.description,
         photo: imageId ?? undefined,
         isPaid: item.isPaid,
-        Price: item.Price ?? undefined,
+        price: item.price ?? undefined,
         paymentUrl: item.paymentUrl ?? undefined,
         type: item.type,
         spotsTotal: item.spotsTotal,
@@ -278,6 +382,70 @@ async function seedProducts(strapi: Core.Strapi) {
   strapi.log.info(`seed: products done — created=${created}, skipped=${skipped}`);
 }
 
+async function seedMenuItems(strapi: Core.Strapi) {
+  const existing = await strapi.entityService.count('api::menu-item.menu-item', {});
+  if (existing > 0) {
+    strapi.log.info(`seed: menu items already populated (${existing}), skip`);
+    return;
+  }
+  let order = 0;
+  for (const item of MENU_ITEMS) {
+    await strapi.entityService.create('api::menu-item.menu-item', {
+      data: {
+        name: item.name,
+        volume: item.volume ?? undefined,
+        price: item.price,
+        note: item.note ?? undefined,
+        category: item.category,
+        season: item.season,
+        order: order++,
+        isAvailable: true,
+        publishedAt: new Date(),
+      },
+    });
+    strapi.log.info(`seed: menu-item "${item.name}" (${item.category}/${item.season}) created`);
+  }
+}
+
+async function seedCafeMenuPage(strapi: Core.Strapi) {
+  /* count работает и для Single Type — вернёт 0 или 1. */
+  const existing = await strapi.entityService.count('api::cafe-menu-page.cafe-menu-page', {});
+  if (existing > 0) {
+    strapi.log.info('seed: cafe-menu-page already populated, skip');
+    return;
+  }
+
+  const [main, summer] = MENU_POSTER_SOURCES;
+
+  let mainId: number | null = null;
+  if (fs.existsSync(main.path)) {
+    mainId = await uploadLocalImage(strapi, main.path, main.displayName, main.alt);
+  } else {
+    strapi.log.warn(`seed: cafe menu poster "${main.path}" not found, leaving empty`);
+  }
+
+  let summerId: number | null = null;
+  if (fs.existsSync(summer.path)) {
+    summerId = await uploadLocalImage(strapi, summer.path, summer.displayName, summer.alt);
+  } else {
+    strapi.log.warn(`seed: cafe menu poster "${summer.path}" not found, leaving empty`);
+  }
+
+  await strapi.entityService.create('api::cafe-menu-page.cafe-menu-page', {
+    data: {
+      mainPosterImage: mainId ?? undefined,
+      mainPosterAlt: main.alt,
+      summerPosterImage: summerId ?? undefined,
+      summerPosterAlt: summer.alt,
+      footnote: CAFE_MENU_FOOTNOTE,
+      publishedAt: new Date(),
+    },
+  });
+  strapi.log.info(
+    `seed: cafe-menu-page created (main=${mainId ?? 'none'}, summer=${summerId ?? 'none'})`,
+  );
+}
+
 async function seedShowroom(strapi: Core.Strapi) {
   const existing = await strapi.entityService.count('api::showroom.showroom', {});
   if (existing > 0) {
@@ -296,14 +464,17 @@ async function seedShowroom(strapi: Core.Strapi) {
 
 export async function runBootstrapSeed(strapi: Core.Strapi) {
   if (process.env.SEED_FORCE === 'true') {
-    strapi.log.warn('seed: SEED_FORCE=true — wiping all directions/events/products/showroom before reseed');
+    strapi.log.warn('seed: SEED_FORCE=true — wiping directions/events/products/showroom/menu before reseed');
     await clearCollection(strapi, 'api::direction.direction', 'directions');
     await clearCollection(strapi, 'api::event.event', 'events');
     await clearCollection(strapi, 'api::product.product', 'products');
     await clearCollection(strapi, 'api::showroom.showroom', 'showroom');
+    await clearCollection(strapi, 'api::menu-item.menu-item', 'menu-items');
   }
   await seedDirections(strapi);
   await seedEvents(strapi);
   await seedProducts(strapi);
   await seedShowroom(strapi);
+  await seedMenuItems(strapi);
+  await seedCafeMenuPage(strapi);
 }

@@ -477,6 +477,83 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAnnualReportAnnualReport
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'annual_reports';
+  info: {
+    description: '\u0413\u043E\u0434\u043E\u0432\u0430\u044F \u043E\u0442\u0447\u0451\u0442\u043D\u043E\u0441\u0442\u044C \u0444\u043E\u043D\u0434\u0430. \u041D\u0430 \u0441\u0430\u0439\u0442\u0435 \u0433\u0440\u0443\u043F\u043F\u0438\u0440\u0443\u0435\u0442\u0441\u044F \u043F\u043E \u0433\u043E\u0434\u0443. \u0423 \u043A\u0430\u0436\u0434\u043E\u0433\u043E \u0433\u043E\u0434\u0430 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0442\u0438\u043F\u043E\u0432 \u043E\u0442\u0447\u0451\u0442\u043E\u0432 (\u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439, \u0444\u0438\u043D\u0430\u043D\u0441\u043E\u0432\u044B\u0439, \u0432 \u041C\u0438\u043D\u044E\u0441\u0442, \u0440\u0430\u0441\u0445\u043E\u0434\u043E\u0432\u0430\u043D\u0438\u0435 \u0441\u0440\u0435\u0434\u0441\u0442\u0432).';
+    displayName: '\u0413\u043E\u0434\u043E\u0432\u044B\u0435 \u043E\u0442\u0447\u0451\u0442\u044B';
+    pluralName: 'annual-reports';
+    singularName: 'annual-report';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    kind: Schema.Attribute.Enumeration<
+      ['content', 'finance', 'nko-activity', 'spending']
+    > &
+      Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::annual-report.annual-report'
+    > &
+      Schema.Attribute.Private;
+    note: Schema.Attribute.Text;
+    pdf: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    year: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 2100;
+          min: 2020;
+        },
+        number
+      >;
+  };
+}
+
+export interface ApiCafeMenuPageCafeMenuPage extends Struct.SingleTypeSchema {
+  collectionName: 'cafe_menu_pages';
+  info: {
+    description: '\u0424\u043E\u0442\u043E \u043F\u0435\u0447\u0430\u0442\u043D\u044B\u0445 \u043F\u043E\u0441\u0442\u0435\u0440\u043E\u0432 \u043C\u0435\u043D\u044E (\u043E\u0441\u043D\u043E\u0432\u043D\u043E\u0435 \u0438 \u0441\u0435\u0437\u043E\u043D\u043D\u043E\u0435) \u0438 \u043E\u0431\u0449\u0430\u044F \u0441\u043D\u043E\u0441\u043A\u0430 \u043F\u043E\u0434 \u043C\u0435\u043D\u044E. \u041F\u043E\u0437\u0438\u0446\u0438\u0438 \u0440\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u044E\u0442\u0441\u044F \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u043E \u2014 \u0432 \u043A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u0438 \u00AB\u041F\u043E\u0437\u0438\u0446\u0438\u0438 \u043C\u0435\u043D\u044E \u043A\u043E\u0444\u0435\u0439\u043D\u0438\u00BB.';
+    displayName: '\u041C\u0435\u043D\u044E \u043A\u043E\u0444\u0435\u0439\u043D\u0438 \u2014 \u043F\u043E\u0441\u0442\u0435\u0440\u044B';
+    pluralName: 'cafe-menu-pages';
+    singularName: 'cafe-menu-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    footnote: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::cafe-menu-page.cafe-menu-page'
+    > &
+      Schema.Attribute.Private;
+    mainPosterAlt: Schema.Attribute.String;
+    mainPosterImage: Schema.Attribute.Media<'images'>;
+    publishedAt: Schema.Attribute.DateTime;
+    summerPosterAlt: Schema.Attribute.String;
+    summerPosterImage: Schema.Attribute.Media<'images'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiDirectionDirection extends Struct.CollectionTypeSchema {
   collectionName: 'directions';
   info: {
@@ -492,6 +569,7 @@ export interface ApiDirectionDirection extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
+    href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -500,7 +578,7 @@ export interface ApiDirectionDirection extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -533,7 +611,9 @@ export interface ApiEventRegistrationEventRegistration
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String & Schema.Attribute.Required;
-    paymentStatus: Schema.Attribute.Enumeration<['pending', ' not_required']>;
+    paymentStatus: Schema.Attribute.Enumeration<
+      ['pending', 'not_required', 'paid']
+    >;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
@@ -558,17 +638,19 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     date: Schema.Attribute.DateTime;
     description: Schema.Attribute.Text;
-    isPaid: Schema.Attribute.Boolean;
+    gallery: Schema.Attribute.Media<'images', true>;
+    isPaid: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::event.event'> &
       Schema.Attribute.Private;
     paymentUrl: Schema.Attribute.String;
     photo: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    Price: Schema.Attribute.Integer;
+    price: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'>;
     spotsTaken: Schema.Attribute.Integer;
     spotsTotal: Schema.Attribute.Integer;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     type: Schema.Attribute.Enumeration<
       [
         '\u043C\u0443\u0437\u044B\u043A\u0430',
@@ -580,6 +662,132 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiLegalDocumentLegalDocument
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'legal_documents';
+  info: {
+    description: '\u0423\u0447\u0440\u0435\u0434\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B, \u0440\u0435\u043A\u0432\u0438\u0437\u0438\u0442\u044B, \u043F\u043E\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u043E \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u043B\u044C\u043D\u044B\u0445 \u0434\u0430\u043D\u043D\u044B\u0445. \u0413\u0440\u0443\u043F\u043F\u0438\u0440\u0443\u044E\u0442\u0441\u044F \u043D\u0430 \u0441\u0430\u0439\u0442\u0435 \u043F\u043E category.';
+    displayName: '\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B \u0444\u043E\u043D\u0434\u0430';
+    pluralName: 'legal-documents';
+    singularName: 'legal-document';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      ['requisites', 'foundation', 'privacy']
+    > &
+      Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::legal-document.legal-document'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    pdf: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMenuItemMenuItem extends Struct.CollectionTypeSchema {
+  collectionName: 'menu_items';
+  info: {
+    description: '\u0421\u043F\u0438\u0441\u043E\u043A \u043D\u0430\u043F\u0438\u0442\u043A\u043E\u0432 \u0438 \u0442\u043E\u043F\u0438\u043D\u0433\u043E\u0432 \u043A\u043E\u0444\u0435\u0439\u043D\u0438. \u0421\u0433\u0440\u0443\u043F\u043F\u0438\u0440\u043E\u0432\u0430\u043D\u044B \u043F\u043E \u0440\u0430\u0437\u0434\u0435\u043B\u0443 (category) \u0438 \u0441\u0435\u0437\u043E\u043D\u0443 (season).';
+    displayName: '\u041F\u043E\u0437\u0438\u0446\u0438\u0438 \u043C\u0435\u043D\u044E \u043A\u043E\u0444\u0435\u0439\u043D\u0438';
+    pluralName: 'menu-items';
+    singularName: 'menu-item';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      ['coffee', 'tea', 'signature', 'topping', 'cold', 'lemonade']
+    > &
+      Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    isAvailable: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::menu-item.menu-item'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    note: Schema.Attribute.Text;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    price: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    season: Schema.Attribute.Enumeration<['main', 'summer', 'winter']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'main'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    volume: Schema.Attribute.String;
+  };
+}
+
+export interface ApiMonthlyReportMonthlyReport
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'monthly_reports';
+  info: {
+    description: '\u041A\u043E\u0440\u043E\u0442\u043A\u0438\u0435 \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u043E\u0442\u0447\u0451\u0442\u044B \u0437\u0430 \u043C\u0435\u0441\u044F\u0446. \u041A\u0430\u0436\u0434\u0430\u044F \u0437\u0430\u043F\u0438\u0441\u044C = \u043E\u0434\u0438\u043D PDF \u0437\u0430 \u043A\u043E\u043D\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043C\u0435\u0441\u044F\u0446.';
+    displayName: '\u0415\u0436\u0435\u043C\u0435\u0441\u044F\u0447\u043D\u044B\u0435 \u043E\u0442\u0447\u0451\u0442\u044B';
+    pluralName: 'monthly-reports';
+    singularName: 'monthly-report';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::monthly-report.monthly-report'
+    > &
+      Schema.Attribute.Private;
+    month: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 12;
+          min: 1;
+        },
+        number
+      >;
+    pdf: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    summary: Schema.Attribute.Text;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    year: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 2100;
+          min: 2020;
+        },
+        number
+      >;
   };
 }
 
@@ -642,6 +850,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     >;
     image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'> &
       Schema.Attribute.Required;
+    isAvailable: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -650,7 +859,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     price: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1197,9 +1406,14 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::annual-report.annual-report': ApiAnnualReportAnnualReport;
+      'api::cafe-menu-page.cafe-menu-page': ApiCafeMenuPageCafeMenuPage;
       'api::direction.direction': ApiDirectionDirection;
       'api::event-registration.event-registration': ApiEventRegistrationEventRegistration;
       'api::event.event': ApiEventEvent;
+      'api::legal-document.legal-document': ApiLegalDocumentLegalDocument;
+      'api::menu-item.menu-item': ApiMenuItemMenuItem;
+      'api::monthly-report.monthly-report': ApiMonthlyReportMonthlyReport;
       'api::order.order': ApiOrderOrder;
       'api::product.product': ApiProductProduct;
       'api::showroom.showroom': ApiShowroomShowroom;

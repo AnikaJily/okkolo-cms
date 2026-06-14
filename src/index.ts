@@ -6,6 +6,11 @@ const PUBLIC_READ_UIDS = [
   'api::event.event',
   'api::product.product',
   'api::showroom.showroom',
+  'api::cafe-menu-page.cafe-menu-page',
+  'api::menu-item.menu-item',
+  'api::monthly-report.monthly-report',
+  'api::annual-report.annual-report',
+  'api::legal-document.legal-document',
 ];
 
 const PUBLIC_CREATE_UIDS: string[] = [

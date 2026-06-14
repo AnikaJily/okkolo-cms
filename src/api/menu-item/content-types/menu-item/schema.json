@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "menu_items",
+  "info": {
+    "singularName": "menu-item",
+    "pluralName": "menu-items",
+    "displayName": "Позиции меню кофейни",
+    "description": "Список напитков и топингов кофейни. Сгруппированы по разделу (category) и сезону (season)."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "volume": {
+      "type": "string",
+      "description": "Например: 0,2 или 0,2 / 0,3"
+    },
+    "price": {
+      "type": "string",
+      "required": true,
+      "description": "Строкой, чтобы поддерживать вилку: «200 / 220 ₽»."
+    },
+    "note": {
+      "type": "text",
+      "description": "Состав или примечание."
+    },
+    "category": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "coffee",
+        "tea",
+        "signature",
+        "topping",
+        "cold",
+        "lemonade"
+      ],
+      "description": "coffee — кофе, tea — чай, signature — авторские, topping — топинги, cold — холодные напитки, lemonade — лимонады."
+    },
+    "season": {
+      "type": "enumeration",
+      "required": true,
+      "default": "main",
+      "enum": [
+        "main",
+        "summer",
+        "winter"
+      ],
+      "description": "main — основное меню, summer — летнее, winter — зимнее."
+    },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "description": "Порядок внутри секции. Меньше — выше."
+    },
+    "isAvailable": {
+      "type": "boolean",
+      "default": true,
+      "description": "Снять галочку, чтобы временно скрыть позицию (например, нет в наличии)."
+    }
+  }
+}
