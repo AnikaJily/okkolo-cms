@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "about_team_photos",
+  "info": {
+    "singularName": "about-team-photo",
+    "pluralName": "about-team-photos",
+    "displayName": "О нас — фото команды",
+    "description": "Фотографии для блока «Команда» на странице /about."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "alt": {
+      "type": "string",
+      "description": "Альтернативный текст для скринридеров."
+    },
+    "caption": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

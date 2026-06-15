@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "about_workplace_photos",
+  "info": {
+    "singularName": "about-workplace-photo",
+    "pluralName": "about-workplace-photos",
+    "displayName": "О нас — фото пространства",
+    "description": "Фотографии пространства «Окколо» для страницы /about."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "alt": {
+      "type": "string",
+      "description": "Альтернативный текст для скринридеров."
+    },
+    "caption": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

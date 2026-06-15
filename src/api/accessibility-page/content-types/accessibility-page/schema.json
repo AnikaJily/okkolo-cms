@@ -1,0 +1,30 @@
+{
+  "kind": "singleType",
+  "collectionName": "accessibility_pages",
+  "info": {
+    "singularName": "accessibility-page",
+    "pluralName": "accessibility-pages",
+    "displayName": "Страница «Доступность»",
+    "description": "Тексты и медиа для /accessibility."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "lead": {
+      "type": "text"
+    },
+    "heroPhoto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "heroPhotoAlt": {
+      "type": "string"
+    }
+  }
+}

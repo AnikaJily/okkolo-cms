@@ -1,0 +1,48 @@
+{
+  "kind": "singleType",
+  "collectionName": "workshops_pages",
+  "info": {
+    "singularName": "workshops-page",
+    "pluralName": "workshops-pages",
+    "displayName": "Страница «Мастерские»",
+    "description": "Тексты и медиа для /workshops. Программы обучения — отдельная коллекция «Программы мастерских»."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "intro": {
+      "type": "text",
+      "description": "Лид под заголовком «Мастерские»."
+    },
+    "audienceText": {
+      "type": "text",
+      "description": "Блок «Кому подходят мастерские»."
+    },
+    "audienceNote": {
+      "type": "text",
+      "description": "Текст в жёлтой плашке «Важно»."
+    },
+    "afterIntro": {
+      "type": "text",
+      "description": "Вводный текст блока «Что будет после обучения»."
+    },
+    "audiencePhoto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "audiencePhotoAlt": {
+      "type": "string"
+    },
+    "afterLearningPhoto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "afterLearningPhotoAlt": {
+      "type": "string"
+    }
+  }
+}

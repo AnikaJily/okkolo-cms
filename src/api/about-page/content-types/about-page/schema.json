@@ -1,0 +1,36 @@
+{
+  "kind": "singleType",
+  "collectionName": "about_pages",
+  "info": {
+    "singularName": "about-page",
+    "pluralName": "about-pages",
+    "displayName": "Страница «О нас»",
+    "description": "Основные тексты для /about. Фото команды и пространства — в отдельных коллекциях."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "lead": {
+      "type": "text"
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "heroPhoto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "heroPhotoAlt": {
+      "type": "string"
+    }
+  }
+}

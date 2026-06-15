@@ -477,6 +477,139 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAboutPageAboutPage extends Struct.SingleTypeSchema {
+  collectionName: 'about_pages';
+  info: {
+    description: '\u041E\u0441\u043D\u043E\u0432\u043D\u044B\u0435 \u0442\u0435\u043A\u0441\u0442\u044B \u0434\u043B\u044F /about. \u0424\u043E\u0442\u043E \u043A\u043E\u043C\u0430\u043D\u0434\u044B \u0438 \u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u0441\u0442\u0432\u0430 \u2014 \u0432 \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0445 \u043A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u044F\u0445.';
+    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u00AB\u041E \u043D\u0430\u0441\u00BB';
+    pluralName: 'about-pages';
+    singularName: 'about-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    eyebrow: Schema.Attribute.String;
+    heroPhoto: Schema.Attribute.Media<'images'>;
+    heroPhotoAlt: Schema.Attribute.String;
+    lead: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::about-page.about-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    tagline: Schema.Attribute.String;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiAboutTeamPhotoAboutTeamPhoto
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'about_team_photos';
+  info: {
+    description: '\u0424\u043E\u0442\u043E\u0433\u0440\u0430\u0444\u0438\u0438 \u0434\u043B\u044F \u0431\u043B\u043E\u043A\u0430 \u00AB\u041A\u043E\u043C\u0430\u043D\u0434\u0430\u00BB \u043D\u0430 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0435 /about.';
+    displayName: '\u041E \u043D\u0430\u0441 \u2014 \u0444\u043E\u0442\u043E \u043A\u043E\u043C\u0430\u043D\u0434\u044B';
+    pluralName: 'about-team-photos';
+    singularName: 'about-team-photo';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    alt: Schema.Attribute.String;
+    caption: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::about-team-photo.about-team-photo'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiAboutWorkplacePhotoAboutWorkplacePhoto
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'about_workplace_photos';
+  info: {
+    description: '\u0424\u043E\u0442\u043E\u0433\u0440\u0430\u0444\u0438\u0438 \u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u0441\u0442\u0432\u0430 \u00AB\u041E\u043A\u043A\u043E\u043B\u043E\u00BB \u0434\u043B\u044F \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B /about.';
+    displayName: '\u041E \u043D\u0430\u0441 \u2014 \u0444\u043E\u0442\u043E \u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u0441\u0442\u0432\u0430';
+    pluralName: 'about-workplace-photos';
+    singularName: 'about-workplace-photo';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    alt: Schema.Attribute.String;
+    caption: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::about-workplace-photo.about-workplace-photo'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiAccessibilityPageAccessibilityPage
+  extends Struct.SingleTypeSchema {
+  collectionName: 'accessibility_pages';
+  info: {
+    description: '\u0422\u0435\u043A\u0441\u0442\u044B \u0438 \u043C\u0435\u0434\u0438\u0430 \u0434\u043B\u044F /accessibility.';
+    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u00AB\u0414\u043E\u0441\u0442\u0443\u043F\u043D\u043E\u0441\u0442\u044C\u00BB';
+    pluralName: 'accessibility-pages';
+    singularName: 'accessibility-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    heroPhoto: Schema.Attribute.Media<'images'>;
+    heroPhotoAlt: Schema.Attribute.String;
+    lead: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::accessibility-page.accessibility-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiAnnualReportAnnualReport
   extends Struct.CollectionTypeSchema {
   collectionName: 'annual_reports';
@@ -885,6 +1018,75 @@ export interface ApiShowroomShowroom extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::showroom.showroom'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiWorkshopProgramWorkshopProgram
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'workshop_programs';
+  info: {
+    description: '\u041A\u0430\u0440\u0442\u043E\u0447\u043A\u0438 \u0431\u043B\u043E\u043A\u0430 \u00AB\u0427\u0435\u043C\u0443 \u043C\u044B \u0443\u0447\u0438\u043C\u00BB \u043D\u0430 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0435 /workshops.';
+    displayName: '\u041F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u044B \u043C\u0430\u0441\u0442\u0435\u0440\u0441\u043A\u0438\u0445';
+    pluralName: 'workshop-programs';
+    singularName: 'workshop-program';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    image: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::workshop-program.workshop-program'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiWorkshopsPageWorkshopsPage extends Struct.SingleTypeSchema {
+  collectionName: 'workshops_pages';
+  info: {
+    description: '\u0422\u0435\u043A\u0441\u0442\u044B \u0438 \u043C\u0435\u0434\u0438\u0430 \u0434\u043B\u044F /workshops. \u041F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u044B \u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044F \u2014 \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u0430\u044F \u043A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u044F \u00AB\u041F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u044B \u043C\u0430\u0441\u0442\u0435\u0440\u0441\u043A\u0438\u0445\u00BB.';
+    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u00AB\u041C\u0430\u0441\u0442\u0435\u0440\u0441\u043A\u0438\u0435\u00BB';
+    pluralName: 'workshops-pages';
+    singularName: 'workshops-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    afterIntro: Schema.Attribute.Text;
+    afterLearningPhoto: Schema.Attribute.Media<'images'>;
+    afterLearningPhotoAlt: Schema.Attribute.String;
+    audienceNote: Schema.Attribute.Text;
+    audiencePhoto: Schema.Attribute.Media<'images'>;
+    audiencePhotoAlt: Schema.Attribute.String;
+    audienceText: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    intro: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::workshops-page.workshops-page'
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
@@ -1406,6 +1608,10 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::about-page.about-page': ApiAboutPageAboutPage;
+      'api::about-team-photo.about-team-photo': ApiAboutTeamPhotoAboutTeamPhoto;
+      'api::about-workplace-photo.about-workplace-photo': ApiAboutWorkplacePhotoAboutWorkplacePhoto;
+      'api::accessibility-page.accessibility-page': ApiAccessibilityPageAccessibilityPage;
       'api::annual-report.annual-report': ApiAnnualReportAnnualReport;
       'api::cafe-menu-page.cafe-menu-page': ApiCafeMenuPageCafeMenuPage;
       'api::direction.direction': ApiDirectionDirection;
@@ -1417,6 +1623,8 @@ declare module '@strapi/strapi' {
       'api::order.order': ApiOrderOrder;
       'api::product.product': ApiProductProduct;
       'api::showroom.showroom': ApiShowroomShowroom;
+      'api::workshop-program.workshop-program': ApiWorkshopProgramWorkshopProgram;
+      'api::workshops-page.workshops-page': ApiWorkshopsPageWorkshopsPage;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

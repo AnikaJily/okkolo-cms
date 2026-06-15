@@ -11,6 +11,12 @@ const PUBLIC_READ_UIDS = [
   'api::monthly-report.monthly-report',
   'api::annual-report.annual-report',
   'api::legal-document.legal-document',
+  'api::workshops-page.workshops-page',
+  'api::workshop-program.workshop-program',
+  'api::about-page.about-page',
+  'api::about-workplace-photo.about-workplace-photo',
+  'api::about-team-photo.about-team-photo',
+  'api::accessibility-page.accessibility-page',
 ];
 
 const PUBLIC_CREATE_UIDS: string[] = [
