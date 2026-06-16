@@ -22,6 +22,12 @@
     "email": {
       "type": "email"
     },
+    "itemsSubtotal": {
+      "type": "integer"
+    },
+    "deliveryPrice": {
+      "type": "integer"
+    },
     "totalPrice": {
       "type": "integer"
     },
