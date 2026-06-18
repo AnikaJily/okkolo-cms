@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "workshop_applications",
+  "info": {
+    "singularName": "workshop-application",
+    "pluralName": "workshop-applications",
+    "displayName": "Заявка на мастерскую"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "contactMethod": {
+      "type": "enumeration",
+      "enum": [
+        "phone",
+        "email"
+      ],
+      "required": true,
+      "default": "phone",
+      "description": "Как с заявителем удобно связаться: phone — звонок, email — письмо."
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "contacted",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "pending — новая, contacted — связались, rejected — отклонена."
+    }
+  }
+}

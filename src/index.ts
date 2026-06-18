@@ -21,6 +21,7 @@ const PUBLIC_READ_UIDS = [
 
 const PUBLIC_CREATE_UIDS: string[] = [
   'api::event-registration.event-registration',
+  'api::workshop-application.workshop-application',
   'api::order.order',
 ];
 

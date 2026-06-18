@@ -942,9 +942,11 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     customerName: Schema.Attribute.String & Schema.Attribute.Required;
     deliveryComment: Schema.Attribute.Text;
+    deliveryPrice: Schema.Attribute.Integer;
     email: Schema.Attribute.Email;
     fulfillmentType: Schema.Attribute.Enumeration<['pickup', 'delivery']>;
     items: Schema.Attribute.JSON;
+    itemsSubtotal: Schema.Attribute.Integer;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'> &
       Schema.Attribute.Private;
@@ -1021,6 +1023,42 @@ export interface ApiShowroomShowroom extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiWorkshopApplicationWorkshopApplication
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'workshop_applications';
+  info: {
+    displayName: '\u0417\u0430\u044F\u0432\u043A\u0430 \u043D\u0430 \u043C\u0430\u0441\u0442\u0435\u0440\u0441\u043A\u0443\u044E';
+    pluralName: 'workshop-applications';
+    singularName: 'workshop-application';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    contactMethod: Schema.Attribute.Enumeration<['phone', 'email']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'phone'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::workshop-application.workshop-application'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    phone: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    status: Schema.Attribute.Enumeration<['pending', 'contacted', 'rejected']> &
+      Schema.Attribute.DefaultTo<'pending'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1623,6 +1661,7 @@ declare module '@strapi/strapi' {
       'api::order.order': ApiOrderOrder;
       'api::product.product': ApiProductProduct;
       'api::showroom.showroom': ApiShowroomShowroom;
+      'api::workshop-application.workshop-application': ApiWorkshopApplicationWorkshopApplication;
       'api::workshop-program.workshop-program': ApiWorkshopProgramWorkshopProgram;
       'api::workshops-page.workshops-page': ApiWorkshopsPageWorkshopsPage;
       'plugin::content-releases.release': PluginContentReleasesRelease;
