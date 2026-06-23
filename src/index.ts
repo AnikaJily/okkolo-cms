@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import { applyRussianContentManagerLabels } from './apply-content-manager-labels';
 import { runBootstrapSeed } from './bootstrap-seed';
 
 const PUBLIC_READ_UIDS = [
@@ -58,6 +59,14 @@ export default {
       await ensurePublicPermissions(strapi);
     } catch (err) {
       strapi.log.error('bootstrap: failed to ensure public permissions', err);
+    }
+
+    if (process.env.APPLY_RU_LABELS !== 'false') {
+      try {
+        await applyRussianContentManagerLabels(strapi);
+      } catch (err) {
+        strapi.log.error('bootstrap: failed to apply Russian content-manager labels', err);
+      }
     }
 
     if (process.env.SEED_ON_BOOT !== 'false') {
