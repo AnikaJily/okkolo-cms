@@ -54,10 +54,6 @@ const DIRECTIONS: DirectionSeed[] = [
   { title: 'Мастерские', description: 'Живые студии и курсы: керамика, текстиль, ювелирка и графика — рядом с кофейней, в спокойном темпе и с наставниками.', keywords: 'workshop,craft', lock: 1002 },
   { title: 'Шоурум', description: 'Изделия мастерских и небольшие тиражи от местных авторов: керамика, текстиль, украшения и одежда.', keywords: 'showroom,interior', lock: 1003 },
   { title: 'События', description: 'Концерты, мастер-классы и лекции в дружелюбной атмосфере — для всех, кто рядом.', keywords: 'event,concert', lock: 1004 },
-  { title: 'Гончарная студия «На кругу»', description: 'Керамика для города: спокойный круг, руки в глине и понятный путь от комка до застеклованной чашки.', keywords: 'pottery,ceramics', lock: 1005 },
-  { title: 'Текстильная мастерская «Узел»', description: 'Ткачество на раме, батик и аккуратный шов — чтобы дом стал чуть теплее на ощупь.', keywords: 'textile,fabric', lock: 1006 },
-  { title: 'Ювелирная лаборатория «Застёжка»', description: 'Литьё из воска, пайка и аккуратная полировка — небольшие изделия с характером.', keywords: 'jewelry,silver', lock: 1007 },
-  { title: 'Студия печати «Лист»', description: 'Линогравюра и монотипия: быстрый результат, понятная техника и аккуратная типографика.', keywords: 'print,linocut', lock: 1008 },
 ];
 
 function dayAt(daysFromNow: number, hours: number, minutes = 0): string {
@@ -152,6 +148,22 @@ const PRODUCT_TEMPLATES: Omit<ProductSeed, 'lock'>[] = [
 ];
 
 const PRODUCTS: ProductSeed[] = PRODUCT_TEMPLATES.map((p, i) => ({ ...p, lock: 3000 + i }));
+
+// Категории шоурума (справочник). slug совпадает с ProductSeed.category.
+const CATEGORY_SEED: { slug: ProductCategory; name: string; order: number }[] = [
+  { slug: 'ceramics', name: 'Керамика', order: 1 },
+  { slug: 'jewelry', name: 'Бижутерия', order: 2 },
+  { slug: 'clothing', name: 'Одежда', order: 3 },
+  { slug: 'textile', name: 'Текстиль', order: 4 },
+];
+
+// Типы мероприятий (справочник). name совпадает с EventSeed.type (по нему линкуем).
+const EVENT_TYPE_SEED: { slug: string; name: EventType; order: number }[] = [
+  { slug: 'music', name: 'музыка', order: 1 },
+  { slug: 'master-class', name: 'мастер-класс', order: 2 },
+  { slug: 'lecture', name: 'лекция', order: 3 },
+  { slug: 'standup', name: 'стенд-ап', order: 4 },
+];
 
 /**
  * Меню кофейни. При первом запуске сидим как одно общее меню (season + category),
@@ -323,14 +335,40 @@ async function seedDirections(strapi: Core.Strapi) {
   }
 }
 
+async function seedEventTypes(strapi: Core.Strapi) {
+  const existing = await strapi.entityService.count('api::event-type.event-type', {});
+  if (existing > 0) {
+    strapi.log.info(`seed: event types already populated (${existing}), skip`);
+    return;
+  }
+  for (const item of EVENT_TYPE_SEED) {
+    await strapi.entityService.create('api::event-type.event-type', {
+      data: { name: item.name, slug: item.slug, order: item.order, publishedAt: new Date() },
+    });
+    strapi.log.info(`seed: event-type "${item.name}" created`);
+  }
+}
+
+async function getEventTypeMap(strapi: Core.Strapi): Promise<Map<string, number>> {
+  const types = (await strapi.entityService.findMany('api::event-type.event-type', {
+    fields: ['id', 'name'],
+  } as any)) as Array<{ id: number; name: string }>;
+  return new Map(types.map((t) => [t.name, t.id]));
+}
+
 async function seedEvents(strapi: Core.Strapi) {
   const existing = await strapi.entityService.count('api::event.event', {});
   if (existing > 0) {
     strapi.log.info(`seed: events already populated (${existing}), skip`);
     return;
   }
+  const typeMap = await getEventTypeMap(strapi);
   for (const item of EVENTS) {
     const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title);
+    const typeId = typeMap.get(item.type);
+    if (!typeId) {
+      strapi.log.warn(`seed: event "${item.title}" — type "${item.type}" not found in CMS`);
+    }
     await strapi.entityService.create('api::event.event', {
       data: {
         title: item.title,
@@ -340,14 +378,35 @@ async function seedEvents(strapi: Core.Strapi) {
         isPaid: item.isPaid,
         price: item.price ?? undefined,
         paymentUrl: item.paymentUrl ?? undefined,
-        type: item.type,
+        type: typeId ?? undefined,
         spotsTotal: item.spotsTotal,
         spotsTaken: item.spotsTaken,
         publishedAt: new Date(),
       },
     });
-    strapi.log.info(`seed: event "${item.title}" created (img=${imageId ?? 'none'})`);
+    strapi.log.info(`seed: event "${item.title}" created (img=${imageId ?? 'none'}, type=${typeId ?? 'none'})`);
   }
+}
+
+async function seedCategories(strapi: Core.Strapi) {
+  const existing = await strapi.entityService.count('api::category.category', {});
+  if (existing > 0) {
+    strapi.log.info(`seed: categories already populated (${existing}), skip`);
+    return;
+  }
+  for (const item of CATEGORY_SEED) {
+    await strapi.entityService.create('api::category.category', {
+      data: { name: item.name, slug: item.slug, order: item.order, publishedAt: new Date() },
+    });
+    strapi.log.info(`seed: category "${item.name}" created`);
+  }
+}
+
+async function getCategoryMap(strapi: Core.Strapi): Promise<Map<string, number>> {
+  const cats = (await strapi.entityService.findMany('api::category.category', {
+    fields: ['id', 'slug'],
+  } as any)) as Array<{ id: number; slug: string }>;
+  return new Map(cats.map((c) => [c.slug, c.id]));
 }
 
 async function seedProducts(strapi: Core.Strapi) {
@@ -356,6 +415,7 @@ async function seedProducts(strapi: Core.Strapi) {
     strapi.log.info(`seed: products already populated (${existing}), skip`);
     return;
   }
+  const categoryMap = await getCategoryMap(strapi);
   let created = 0;
   let skipped = 0;
   for (const item of PRODUCTS) {
@@ -365,11 +425,15 @@ async function seedProducts(strapi: Core.Strapi) {
       skipped += 1;
       continue;
     }
+    const categoryId = categoryMap.get(item.category);
+    if (!categoryId) {
+      strapi.log.warn(`seed: product "${item.title}" — category "${item.category}" not found in CMS`);
+    }
     await strapi.entityService.create('api::product.product', {
       data: {
         title: item.title,
         price: item.price,
-        category: item.category,
+        category: categoryId ?? undefined,
         description: item.description,
         cartUrl: item.cartUrl ?? undefined,
         image: imageId,
@@ -377,7 +441,7 @@ async function seedProducts(strapi: Core.Strapi) {
       },
     });
     created += 1;
-    strapi.log.info(`seed: product "${item.title}" created (img=${imageId})`);
+    strapi.log.info(`seed: product "${item.title}" created (img=${imageId}, cat=${categoryId ?? 'none'})`);
   }
   strapi.log.info(`seed: products done — created=${created}, skipped=${skipped}`);
 }
@@ -399,7 +463,6 @@ async function seedMenuItems(strapi: Core.Strapi) {
         category: item.category,
         season: item.season,
         order: order++,
-        isAvailable: true,
         publishedAt: new Date(),
       },
     });
@@ -467,12 +530,18 @@ export async function runBootstrapSeed(strapi: Core.Strapi) {
     strapi.log.warn('seed: SEED_FORCE=true — wiping directions/events/products/showroom/menu before reseed');
     await clearCollection(strapi, 'api::direction.direction', 'directions');
     await clearCollection(strapi, 'api::event.event', 'events');
+    // типы мероприятий чистим ПОСЛЕ мероприятий — события на них ссылаются (FK)
+    await clearCollection(strapi, 'api::event-type.event-type', 'event-types');
     await clearCollection(strapi, 'api::product.product', 'products');
+    // категории чистим ПОСЛЕ товаров — товары на них ссылаются (FK)
+    await clearCollection(strapi, 'api::category.category', 'categories');
     await clearCollection(strapi, 'api::showroom.showroom', 'showroom');
     await clearCollection(strapi, 'api::menu-item.menu-item', 'menu-items');
   }
   await seedDirections(strapi);
+  await seedEventTypes(strapi);
   await seedEvents(strapi);
+  await seedCategories(strapi);
   await seedProducts(strapi);
   await seedShowroom(strapi);
   await seedMenuItems(strapi);

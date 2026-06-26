@@ -515,7 +515,7 @@ export interface ApiAboutTeamPhotoAboutTeamPhoto
   extends Struct.CollectionTypeSchema {
   collectionName: 'about_team_photos';
   info: {
-    description: '\u0424\u043E\u0442\u043E\u0433\u0440\u0430\u0444\u0438\u0438 \u0434\u043B\u044F \u0431\u043B\u043E\u043A\u0430 \u00AB\u041A\u043E\u043C\u0430\u043D\u0434\u0430\u00BB \u043D\u0430 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0435 /about.';
+    description: '\u0427\u043B\u0435\u043D\u044B \u043A\u043E\u043C\u0430\u043D\u0434\u044B (\u0444\u043E\u0442\u043E + \u0438\u043C\u044F + \u0434\u043E\u043B\u0436\u043D\u043E\u0441\u0442\u044C) \u0434\u043B\u044F \u0431\u043B\u043E\u043A\u0430 \u00AB\u041A\u043E\u043C\u0430\u043D\u0434\u0430\u00BB \u043D\u0430 /about.';
     displayName: '\u041E \u043D\u0430\u0441 \u2014 \u0444\u043E\u0442\u043E \u043A\u043E\u043C\u0430\u043D\u0434\u044B';
     pluralName: 'about-team-photos';
     singularName: 'about-team-photo';
@@ -524,8 +524,6 @@ export interface ApiAboutTeamPhotoAboutTeamPhoto
     draftAndPublish: true;
   };
   attributes: {
-    alt: Schema.Attribute.String;
-    caption: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -536,8 +534,10 @@ export interface ApiAboutTeamPhotoAboutTeamPhoto
       'api::about-team-photo.about-team-photo'
     > &
       Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
+    role: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -558,7 +558,6 @@ export interface ApiAboutWorkplacePhotoAboutWorkplacePhoto
   };
   attributes: {
     alt: Schema.Attribute.String;
-    caption: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -687,6 +686,38 @@ export interface ApiCafeMenuPageCafeMenuPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
+  collectionName: 'categories';
+  info: {
+    description: '\u0421\u043F\u0440\u0430\u0432\u043E\u0447\u043D\u0438\u043A \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0439 \u0442\u043E\u0432\u0430\u0440\u043E\u0432. \u0417\u0430\u0432\u043E\u0434\u0438\u0442\u0441\u044F \u043A\u043E\u043D\u0442\u0435\u043D\u0442-\u043C\u0435\u043D\u0435\u0434\u0436\u0435\u0440\u043E\u043C \u0431\u0435\u0437 \u043F\u0440\u0430\u0432\u043A\u0438 \u043A\u043E\u0434\u0430.';
+    displayName: '\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F \u0448\u043E\u0443\u0440\u0443\u043C\u0430';
+    pluralName: 'categories';
+    singularName: 'category';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::category.category'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiDirectionDirection extends Struct.CollectionTypeSchema {
   collectionName: 'directions';
   info: {
@@ -735,6 +766,7 @@ export interface ApiEventRegistrationEventRegistration
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     email: Schema.Attribute.Email;
+    event: Schema.Attribute.Relation<'manyToOne', 'api::event.event'>;
     eventId: Schema.Attribute.String;
     eventTitle: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -749,6 +781,38 @@ export interface ApiEventRegistrationEventRegistration
     >;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEventTypeEventType extends Struct.CollectionTypeSchema {
+  collectionName: 'event_types';
+  info: {
+    description: '\u0421\u043F\u0440\u0430\u0432\u043E\u0447\u043D\u0438\u043A \u0442\u0438\u043F\u043E\u0432 \u043C\u0435\u0440\u043E\u043F\u0440\u0438\u044F\u0442\u0438\u0439. \u0417\u0430\u0432\u043E\u0434\u0438\u0442\u0441\u044F \u043A\u043E\u043D\u0442\u0435\u043D\u0442-\u043C\u0435\u043D\u0435\u0434\u0436\u0435\u0440\u043E\u043C \u0431\u0435\u0437 \u043F\u0440\u0430\u0432\u043A\u0438 \u043A\u043E\u0434\u0430.';
+    displayName: '\u0422\u0438\u043F \u043C\u0435\u0440\u043E\u043F\u0440\u0438\u044F\u0442\u0438\u044F';
+    pluralName: 'event-types';
+    singularName: 'event-type';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    events: Schema.Attribute.Relation<'oneToMany', 'api::event.event'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::event-type.event-type'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -780,18 +844,17 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
     photo: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     price: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
+    registrations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::event-registration.event-registration'
+    >;
     slug: Schema.Attribute.UID<'title'>;
     spotsTaken: Schema.Attribute.Integer;
     spotsTotal: Schema.Attribute.Integer;
     title: Schema.Attribute.String & Schema.Attribute.Required;
-    type: Schema.Attribute.Enumeration<
-      [
-        '\u043C\u0443\u0437\u044B\u043A\u0430',
-        '\u043C\u0430\u0441\u0442\u0435\u0440-\u043A\u043B\u0430\u0441\u0441',
-        '\u043B\u0435\u043A\u0446\u0438\u044F',
-        '\u0441\u0442\u0435\u043D\u0434-\u0430\u043F',
-      ]
-    >;
+    type: Schema.Attribute.Relation<'manyToOne', 'api::event-type.event-type'>;
+    typeName: Schema.Attribute.String &
+      Schema.Attribute.CustomField<'global::event-type-name'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -853,7 +916,6 @@ export interface ApiMenuItemMenuItem extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    isAvailable: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -872,55 +934,6 @@ export interface ApiMenuItemMenuItem extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     volume: Schema.Attribute.String;
-  };
-}
-
-export interface ApiMonthlyReportMonthlyReport
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'monthly_reports';
-  info: {
-    description: '\u041A\u043E\u0440\u043E\u0442\u043A\u0438\u0435 \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u043E\u0442\u0447\u0451\u0442\u044B \u0437\u0430 \u043C\u0435\u0441\u044F\u0446. \u041A\u0430\u0436\u0434\u0430\u044F \u0437\u0430\u043F\u0438\u0441\u044C = \u043E\u0434\u0438\u043D PDF \u0437\u0430 \u043A\u043E\u043D\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043C\u0435\u0441\u044F\u0446.';
-    displayName: '\u0415\u0436\u0435\u043C\u0435\u0441\u044F\u0447\u043D\u044B\u0435 \u043E\u0442\u0447\u0451\u0442\u044B';
-    pluralName: 'monthly-reports';
-    singularName: 'monthly-report';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::monthly-report.monthly-report'
-    > &
-      Schema.Attribute.Private;
-    month: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMax<
-        {
-          max: 12;
-          min: 1;
-        },
-        number
-      >;
-    pdf: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
-    publishedAt: Schema.Attribute.DateTime;
-    summary: Schema.Attribute.Text;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    year: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMax<
-        {
-          max: 2100;
-          min: 2020;
-        },
-        number
-      >;
   };
 }
 
@@ -972,9 +985,9 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
   };
   attributes: {
     cartUrl: Schema.Attribute.String;
-    category: Schema.Attribute.Enumeration<
-      ['ceramics', 'clothing', 'jewelry', 'textile']
-    >;
+    category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
+    categoryName: Schema.Attribute.String &
+      Schema.Attribute.CustomField<'global::category-name'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1652,12 +1665,13 @@ declare module '@strapi/strapi' {
       'api::accessibility-page.accessibility-page': ApiAccessibilityPageAccessibilityPage;
       'api::annual-report.annual-report': ApiAnnualReportAnnualReport;
       'api::cafe-menu-page.cafe-menu-page': ApiCafeMenuPageCafeMenuPage;
+      'api::category.category': ApiCategoryCategory;
       'api::direction.direction': ApiDirectionDirection;
       'api::event-registration.event-registration': ApiEventRegistrationEventRegistration;
+      'api::event-type.event-type': ApiEventTypeEventType;
       'api::event.event': ApiEventEvent;
       'api::legal-document.legal-document': ApiLegalDocumentLegalDocument;
       'api::menu-item.menu-item': ApiMenuItemMenuItem;
-      'api::monthly-report.monthly-report': ApiMonthlyReportMonthlyReport;
       'api::order.order': ApiOrderOrder;
       'api::product.product': ApiProductProduct;
       'api::showroom.showroom': ApiShowroomShowroom;

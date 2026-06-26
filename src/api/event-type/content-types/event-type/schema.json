@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "event_types",
+  "info": {
+    "singularName": "event-type",
+    "pluralName": "event-types",
+    "displayName": "Тип мероприятия",
+    "description": "Справочник типов мероприятий. Заводится контент-менеджером без правки кода."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "description": "Отображаемое название, напр. «Лекция»."
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true,
+      "description": "Ключ для фильтра/URL. Уникален — защищает от дублей."
+    },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "description": "Порядок чипов-фильтров: меньше — левее."
+    },
+    "events": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event.event",
+      "mappedBy": "type",
+      "description": "Мероприятия этого типа."
+    }
+  }
+}

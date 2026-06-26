@@ -18,14 +18,17 @@
     "price": {
       "type": "integer"
     },
+    "categoryName": {
+      "type": "string",
+      "customField": "global::category-name",
+      "description": "Начните вводить — покажем похожие категории; выберите существующую или добавьте новую. На сохранении привяжется связь «Категория». Дубли по регистру не плодятся."
+    },
     "category": {
-      "type": "enumeration",
-      "enum": [
-        "ceramics",
-        "clothing",
-        "jewelry",
-        "textile"
-      ]
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "products",
+      "description": "Заполняется автоматически из «categoryName». Можно не трогать."
     },
     "image": {
       "type": "media",

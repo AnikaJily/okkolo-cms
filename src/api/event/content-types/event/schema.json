@@ -53,20 +53,30 @@
     "paymentUrl": {
       "type": "string"
     },
+    "typeName": {
+      "type": "string",
+      "customField": "global::event-type-name",
+      "description": "Начните вводить — покажем похожие типы; выберите существующий или добавьте новый. На сохранении привяжется связь «Тип». Дубли по регистру не плодятся."
+    },
     "type": {
-      "type": "enumeration",
-      "enum": [
-        "музыка",
-        "мастер-класс",
-        "лекция",
-        "стенд-ап"
-      ]
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event-type.event-type",
+      "inversedBy": "events",
+      "description": "Заполняется автоматически из «typeName». Менять вручную не нужно."
     },
     "spotsTotal": {
       "type": "integer"
     },
     "spotsTaken": {
       "type": "integer"
+    },
+    "registrations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event-registration.event-registration",
+      "mappedBy": "event",
+      "description": "Регистрации на это мероприятие. Кол-во = занятые места."
     }
   }
 }

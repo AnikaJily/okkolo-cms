@@ -29,7 +29,15 @@
       "type": "text"
     },
     "eventId": {
-      "type": "string"
+      "type": "string",
+      "description": "Устар.: оставлено для совместимости с лендингом. Источник истины — связь event."
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "registrations",
+      "description": "Мероприятие, на которое подана регистрация."
     },
     "paymentStatus": {
       "type": "enumeration",

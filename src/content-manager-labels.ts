@@ -50,12 +50,24 @@ export const CONTENT_MANAGER_LABELS: Record<string, ContentTypeLabels> = {
     isPaid: ru('Платное мероприятие'),
     price: ru('Цена', 'Сумма в рублях, если мероприятие платное.'),
     paymentUrl: ru('Ссылка на оплату'),
-    type: ru(
+    typeName: ru(
       'Тип',
-      'музыка, мастер-класс, лекция, стенд-ап — как на сайте в фильтрах.',
+      'Начните вводить — покажем похожие типы. Выберите из списка или добавьте новый.',
+      'Например: Лекция',
+    ),
+    type: ru(
+      'Тип (связь)',
+      'Заполняется автоматически из поля «Тип». Менять вручную не нужно.',
     ),
     spotsTotal: ru('Всего мест'),
     spotsTaken: ru('Занято мест'),
+    registrations: ru('Регистрации', 'Заявки на это мероприятие. Заполняется автоматически.'),
+  },
+  'api::event-type.event-type': {
+    name: ru('Название', 'Напр. «Лекция».'),
+    slug: ru('Ключ (slug)', 'Ключ для фильтра/URL. Создаётся из названия, уникален.'),
+    order: ru('Порядок', 'Меньше число — раньше в списке.'),
+    events: ru('Мероприятия', 'Мероприятия этого типа. Заполняется автоматически.'),
   },
   'api::event-registration.event-registration': {
     eventTitle: ru('Название мероприятия'),
@@ -63,7 +75,8 @@ export const CONTENT_MANAGER_LABELS: Record<string, ContentTypeLabels> = {
     phone: ru('Телефон'),
     email: ru('Email'),
     comment: ru('Комментарий'),
-    eventId: ru('ID мероприятия'),
+    eventId: ru('ID мероприятия', 'Технический ключ (slug/documentId). Хранится как история.'),
+    event: ru('Мероприятие (связь)', 'Привязывается автоматически по ID. Менять вручную не нужно.'),
     paymentStatus: ru(
       'Статус оплаты',
       'pending — ждёт оплаты, not_required — оплата не нужна, paid — оплачено.',
@@ -72,9 +85,14 @@ export const CONTENT_MANAGER_LABELS: Record<string, ContentTypeLabels> = {
   'api::product.product': {
     title: ru('Название'),
     price: ru('Цена', 'Сумма в рублях.'),
-    category: ru(
+    categoryName: ru(
       'Категория',
-      'ceramics — керамика, clothing — одежда, jewelry — украшения, textile — текстиль.',
+      'Начните вводить — покажем похожие категории. Выберите из списка или добавьте новую.',
+      'Например: Свечи',
+    ),
+    category: ru(
+      'Категория (связь)',
+      'Заполняется автоматически из поля «Категория». Менять вручную не нужно.',
     ),
     image: ru('Фото'),
     cartUrl: ru('Ссылка «Купить»', 'Если пусто — товар добавляется в корзину на сайте.'),
@@ -84,6 +102,12 @@ export const CONTENT_MANAGER_LABELS: Record<string, ContentTypeLabels> = {
       'В наличии',
       'Снимите галочку, чтобы временно скрыть товар с сайта.',
     ),
+  },
+  'api::category.category': {
+    name: ru('Название', 'Напр. «Керамика».'),
+    slug: ru('Ключ (slug)', 'Ключ для фильтра/URL. Создаётся из названия, уникален.'),
+    order: ru('Порядок', 'Меньше число — левее в фильтрах.'),
+    products: ru('Товары', 'Товары этой категории. Заполняется автоматически.'),
   },
   'api::showroom.showroom': {
     heroImage: ru('Hero-фото страницы шоурума'),
@@ -141,14 +165,13 @@ export const CONTENT_MANAGER_LABELS: Record<string, ContentTypeLabels> = {
   },
   'api::about-team-photo.about-team-photo': {
     image: ru('Фото'),
-    alt: ru('Alt-текст', 'Описание для скринридеров.'),
-    caption: ru('Подпись'),
+    name: ru('Имя'),
+    role: ru('Должность', 'Напр. «бариста». Необязательно.'),
     order: ru('Порядок'),
   },
   'api::about-workplace-photo.about-workplace-photo': {
     image: ru('Фото'),
     alt: ru('Alt-текст', 'Описание для скринридеров.'),
-    caption: ru('Подпись'),
     order: ru('Порядок'),
   },
   'api::accessibility-page.accessibility-page': {
@@ -167,8 +190,7 @@ export const CONTENT_MANAGER_LABELS: Record<string, ContentTypeLabels> = {
       'coffee — кофе, tea — чай, signature — авторские, topping — топинги, cold — холодные, lemonade — лимонады.',
     ),
     season: ru('Сезон', 'main — основное, summer — летнее, winter — зимнее.'),
-    order: ru('Порядок', 'Меньше — выше внутри раздела.'),
-    isAvailable: ru('В наличии', 'Снимите галочку, чтобы скрыть позицию.'),
+    order: ru('Порядок', 'Проставляется автоматически (в конец раздела); можно поменять вручную — меньше выше.'),
   },
   'api::cafe-menu-page.cafe-menu-page': {
     mainPosterImage: ru('Постер основного меню'),
@@ -176,12 +198,6 @@ export const CONTENT_MANAGER_LABELS: Record<string, ContentTypeLabels> = {
     summerPosterImage: ru('Постер летнего меню'),
     summerPosterAlt: ru('Alt летнего постера'),
     footnote: ru('Сноска', 'Текст под обоими меню.'),
-  },
-  'api::monthly-report.monthly-report': {
-    month: ru('Месяц', 'Число от 1 до 12.'),
-    year: ru('Год'),
-    pdf: ru('PDF-файл'),
-    summary: ru('Краткое содержание', 'Опционально, на сайте пока не выводится.'),
   },
   'api::annual-report.annual-report': {
     year: ru('Год'),

@@ -1,15 +1,19 @@
 import type { Core } from '@strapi/strapi';
 import { applyRussianContentManagerLabels } from './apply-content-manager-labels';
+import { registerTextToRelationAutolink } from './autolink-text-to-relation';
+import { registerEventRegistrationLink } from './event-registration-link';
+import { registerMenuItemAutoOrder } from './menu-item-auto-order';
 import { runBootstrapSeed } from './bootstrap-seed';
 
 const PUBLIC_READ_UIDS = [
   'api::direction.direction',
   'api::event.event',
+  'api::event-type.event-type',
   'api::product.product',
+  'api::category.category',
   'api::showroom.showroom',
   'api::cafe-menu-page.cafe-menu-page',
   'api::menu-item.menu-item',
-  'api::monthly-report.monthly-report',
   'api::annual-report.annual-report',
   'api::legal-document.legal-document',
   'api::workshops-page.workshops-page',
@@ -52,7 +56,32 @@ async function ensurePublicPermissions(strapi: Core.Strapi) {
 }
 
 export default {
-  register() {},
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // Кастомные поля-автокомплиты «… с подсказками». Имена/типы обязаны совпадать
+    // с admin-регистрацией в src/admin/app.tsx → uid global::category-name и global::event-type-name.
+    strapi.customFields.register({ name: 'category-name', type: 'string' });
+    strapi.customFields.register({ name: 'event-type-name', type: 'string' });
+
+    // ввод справочного значения текстом → авто-создание/привязка связи на сохранении
+    registerTextToRelationAutolink(strapi, {
+      uid: 'api::product.product',
+      textField: 'categoryName',
+      relationField: 'category',
+      targetUid: 'api::category.category',
+    });
+    registerTextToRelationAutolink(strapi, {
+      uid: 'api::event.event',
+      textField: 'typeName',
+      relationField: 'type',
+      targetUid: 'api::event-type.event-type',
+    });
+
+    // дожать связь заявки с мероприятием по eventId (slug); см. event-registration-link.ts
+    registerEventRegistrationLink(strapi);
+
+    // автопорядок позиций меню (новая позиция — в конец своей группы); см. menu-item-auto-order.ts
+    registerMenuItemAutoOrder(strapi);
+  },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     try {

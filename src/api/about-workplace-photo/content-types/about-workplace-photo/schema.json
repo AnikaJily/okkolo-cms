@@ -22,9 +22,6 @@
       "type": "string",
       "description": "Альтернативный текст для скринридеров."
     },
-    "caption": {
-      "type": "string"
-    },
     "order": {
       "type": "integer",
       "default": 0

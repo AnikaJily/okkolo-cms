@@ -5,7 +5,7 @@
     "singularName": "about-team-photo",
     "pluralName": "about-team-photos",
     "displayName": "О нас — фото команды",
-    "description": "Фотографии для блока «Команда» на странице /about."
+    "description": "Члены команды (фото + имя + должность) для блока «Команда» на /about."
   },
   "options": {
     "draftAndPublish": true
@@ -18,12 +18,14 @@
       "required": true,
       "allowedTypes": ["images"]
     },
-    "alt": {
+    "name": {
       "type": "string",
-      "description": "Альтернативный текст для скринридеров."
+      "required": true,
+      "description": "Имя члена команды (читается скринридером, отдельный alt не нужен)."
     },
-    "caption": {
-      "type": "string"
+    "role": {
+      "type": "string",
+      "description": "Должность/роль, напр. «бариста»."
     },
     "order": {
       "type": "integer",
