@@ -27,8 +27,62 @@ const PRODUCT_CATEGORY_FOLDER: Record<string, MediaFolderName> = {
 const FOLDER_UID = 'plugin::upload.folder' as const;
 const FILE_UID = 'plugin::upload.file' as const;
 
+const FIELD_FOLDER_BY_TYPE: Record<string, Partial<Record<string, MediaFolderName>>> = {
+  'api::event.event': {
+    photo: MEDIA_FOLDER_NAMES.MEROPRIYATIYA,
+    gallery: MEDIA_FOLDER_NAMES.MEROPRIYATIYA,
+  },
+  'api::direction.direction': {
+    image: MEDIA_FOLDER_NAMES.NAPRAVLENIYA,
+  },
+  'api::cafe-menu-page.cafe-menu-page': {
+    mainPosterImage: MEDIA_FOLDER_NAMES.KOFejNYA,
+    summerPosterImage: MEDIA_FOLDER_NAMES.KOFejNYA,
+  },
+  'api::showroom.showroom': {
+    heroImage: MEDIA_FOLDER_NAMES.SAJT_STATIK,
+  },
+  'api::about-team-photo.about-team-photo': {
+    image: MEDIA_FOLDER_NAMES.O_NAS,
+  },
+  'api::about-workplace-photo.about-workplace-photo': {
+    image: MEDIA_FOLDER_NAMES.O_NAS,
+  },
+  'api::about-page.about-page': {
+    heroPhoto: MEDIA_FOLDER_NAMES.O_NAS,
+  },
+  'api::workshop-program.workshop-program': {
+    image: MEDIA_FOLDER_NAMES.MASTERSKIE,
+  },
+  'api::workshops-page.workshops-page': {
+    audiencePhoto: MEDIA_FOLDER_NAMES.MASTERSKIE,
+    afterLearningPhoto: MEDIA_FOLDER_NAMES.MASTERSKIE,
+  },
+  'api::annual-report.annual-report': {
+    pdf: MEDIA_FOLDER_NAMES.OTCHETY,
+  },
+  'api::accessibility-page.accessibility-page': {
+    heroPhoto: MEDIA_FOLDER_NAMES.SAJT_STATIK,
+  },
+  'api::legal-document.legal-document': {
+    pdf: MEDIA_FOLDER_NAMES.SAJT_STATIK,
+  },
+};
+
 type MediaLike = { id?: number } | null | undefined;
 type MediaList = MediaLike | MediaLike[];
+
+type MorphRow = {
+  file_id: number;
+  related_id: number;
+  related_type: string;
+  field: string;
+};
+
+type Assignment = {
+  folder: MediaFolderName;
+  priority: number;
+};
 
 function asList<T>(value: T | T[] | null | undefined): T[] {
   if (!value) return [];
@@ -74,27 +128,108 @@ export function productCategoryToFolder(slug: string | null | undefined): MediaF
   return MEDIA_FOLDER_NAMES.SAJT_STATIK;
 }
 
-export async function moveFileToFolder(
+/**
+ * Перемещение файлов так же, как в админке Strapi (bulk move):
+ * обновляются и folder_path, и связь в files_folder_lnk.
+ */
+async function bulkMoveFilesToFolder(
   strapi: Core.Strapi,
-  fileId: number,
-  folderId: number,
+  fileIds: number[],
+  destinationFolderId: number,
 ): Promise<void> {
-  const uploadService = strapi.plugin('upload').service('upload');
-  await uploadService.updateFileInfo(fileId, { folder: folderId });
+  if (fileIds.length === 0) return;
+
+  const destinationFolder = await strapi.db.query(FOLDER_UID).findOne({
+    where: { id: destinationFolderId },
+    select: ['path'],
+  });
+  if (!destinationFolder?.path) {
+    throw new Error(`media-folders: folder ${destinationFolderId} not found`);
+  }
+
+  // @ts-expect-error — динамические метаданные модели upload
+  const fileJoinTable = strapi.db.metadata.get(FILE_UID).attributes.folder.joinTable;
+  const fileTable = strapi.getModel(FILE_UID).collectionName;
+  // @ts-expect-error — динамические метаданные модели upload
+  const folderPathColName = strapi.db.metadata.get(FILE_UID).attributes.folderPath.columnName;
+
+  const trx = await strapi.db.transaction();
+  try {
+    await strapi.db
+      .queryBuilder(fileJoinTable.name)
+      .transacting(trx.get())
+      .delete()
+      .where({ [fileJoinTable.joinColumn.name]: { $in: fileIds } })
+      .execute();
+
+    await strapi.db
+      .queryBuilder(fileJoinTable.name)
+      .transacting(trx.get())
+      .insert(
+        fileIds.map((fileId) => ({
+          [fileJoinTable.inverseJoinColumn.name]: destinationFolderId,
+          [fileJoinTable.joinColumn.name]: fileId,
+        })),
+      )
+      .execute();
+
+    await strapi.db
+      .getConnection(fileTable)
+      .transacting(trx.get())
+      .whereIn('id', fileIds)
+      .update(folderPathColName, destinationFolder.path);
+
+    await trx.commit();
+  } catch (error) {
+    await trx.rollback();
+    throw error;
+  }
 }
 
-export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
-  const folders = await ensureMediaFolders(strapi);
-  const assignments = new Map<number, MediaFolderName>();
+async function loadProductCategoryMap(strapi: Core.Strapi): Promise<Map<number, string>> {
+  const map = new Map<number, string>();
+  try {
+    const rows = (await strapi.db
+      .connection('products_category_lnk')
+      .join('categories', 'categories.id', 'products_category_lnk.category_id')
+      .select({
+        productId: 'products_category_lnk.product_id',
+        slug: 'categories.slug',
+      })) as Array<{ productId: number; slug: string }>;
 
-  const assign = (fileIds: number[], folder: MediaFolderName) => {
-    for (const id of fileIds) {
-      if (!assignments.has(id)) {
-        assignments.set(id, folder);
-      }
+    for (const row of rows) {
+      map.set(Number(row.productId), row.slug);
     }
-  };
+  } catch (error) {
+    strapi.log.warn(`media-folders: product categories lookup failed: ${(error as Error).message}`);
+  }
+  return map;
+}
 
+async function loadMorphRows(strapi: Core.Strapi): Promise<MorphRow[]> {
+  try {
+    return (await strapi.db.connection('files_related_mph').select('*')) as MorphRow[];
+  } catch (error) {
+    strapi.log.warn(`media-folders: files_related_mph lookup failed: ${(error as Error).message}`);
+    return [];
+  }
+}
+
+function assignWithPriority(
+  assignments: Map<number, Assignment>,
+  fileIds: number[],
+  folder: MediaFolderName,
+  priority: number,
+) {
+  for (const fileId of fileIds) {
+    const current = assignments.get(fileId);
+    if (!current || priority >= current.priority) {
+      assignments.set(fileId, { folder, priority });
+    }
+  }
+}
+
+async function assignFromEntityService(strapi: Core.Strapi, assignments: Map<number, Assignment>) {
   const products = (await strapi.entityService.findMany('api::product.product', {
     populate: { image: true, gallery: true, category: true },
   } as any)) as Array<{
@@ -105,8 +240,8 @@ export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
 
   for (const product of products) {
     const folder = productCategoryToFolder(product.category?.slug);
-    assign(collectMediaIds(product.image), folder);
-    assign(collectMediaIds(product.gallery), folder);
+    assignWithPriority(assignments, collectMediaIds(product.image), folder, 95);
+    assignWithPriority(assignments, collectMediaIds(product.gallery), folder, 95);
   }
 
   const events = (await strapi.entityService.findMany('api::event.event', {
@@ -114,8 +249,8 @@ export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
   } as any)) as Array<{ photo?: MediaLike; gallery?: MediaLike[] }>;
 
   for (const event of events) {
-    assign(collectMediaIds(event.photo), MEDIA_FOLDER_NAMES.MEROPRIYATIYA);
-    assign(collectMediaIds(event.gallery), MEDIA_FOLDER_NAMES.MEROPRIYATIYA);
+    assignWithPriority(assignments, collectMediaIds(event.photo), MEDIA_FOLDER_NAMES.MEROPRIYATIYA, 90);
+    assignWithPriority(assignments, collectMediaIds(event.gallery), MEDIA_FOLDER_NAMES.MEROPRIYATIYA, 90);
   }
 
   const directions = (await strapi.entityService.findMany('api::direction.direction', {
@@ -123,7 +258,7 @@ export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
   } as any)) as Array<{ image?: MediaLike }>;
 
   for (const direction of directions) {
-    assign(collectMediaIds(direction.image), MEDIA_FOLDER_NAMES.NAPRAVLENIYA);
+    assignWithPriority(assignments, collectMediaIds(direction.image), MEDIA_FOLDER_NAMES.NAPRAVLENIYA, 85);
   }
 
   const cafePages = asList(
@@ -133,18 +268,8 @@ export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
   ) as Array<{ mainPosterImage?: MediaLike; summerPosterImage?: MediaLike }>;
 
   for (const page of cafePages) {
-    assign(collectMediaIds(page.mainPosterImage), MEDIA_FOLDER_NAMES.KOFejNYA);
-    assign(collectMediaIds(page.summerPosterImage), MEDIA_FOLDER_NAMES.KOFejNYA);
-  }
-
-  const showroomEntries = asList(
-    await strapi.entityService.findMany('api::showroom.showroom', {
-      populate: { heroImage: true },
-    } as any),
-  ) as Array<{ heroImage?: MediaLike }>;
-
-  for (const entry of showroomEntries) {
-    assign(collectMediaIds(entry.heroImage), MEDIA_FOLDER_NAMES.SAJT_STATIK);
+    assignWithPriority(assignments, collectMediaIds(page.mainPosterImage), MEDIA_FOLDER_NAMES.KOFejNYA, 80);
+    assignWithPriority(assignments, collectMediaIds(page.summerPosterImage), MEDIA_FOLDER_NAMES.KOFejNYA, 80);
   }
 
   const aboutPhotos = [
@@ -157,17 +282,7 @@ export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
   ] as Array<{ image?: MediaLike }>;
 
   for (const photo of aboutPhotos) {
-    assign(collectMediaIds(photo.image), MEDIA_FOLDER_NAMES.O_NAS);
-  }
-
-  const aboutPages = asList(
-    await strapi.entityService.findMany('api::about-page.about-page', {
-      populate: { heroPhoto: true },
-    } as any),
-  ) as Array<{ heroPhoto?: MediaLike }>;
-
-  for (const page of aboutPages) {
-    assign(collectMediaIds(page.heroPhoto), MEDIA_FOLDER_NAMES.O_NAS);
+    assignWithPriority(assignments, collectMediaIds(photo.image), MEDIA_FOLDER_NAMES.O_NAS, 80);
   }
 
   const workshops = [
@@ -186,63 +301,83 @@ export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
   }>;
 
   for (const entry of workshops) {
-    assign(collectMediaIds(entry.image), MEDIA_FOLDER_NAMES.MASTERSKIE);
-    assign(collectMediaIds(entry.audiencePhoto), MEDIA_FOLDER_NAMES.MASTERSKIE);
-    assign(collectMediaIds(entry.afterLearningPhoto), MEDIA_FOLDER_NAMES.MASTERSKIE);
+    assignWithPriority(assignments, collectMediaIds(entry.image), MEDIA_FOLDER_NAMES.MASTERSKIE, 80);
+    assignWithPriority(assignments, collectMediaIds(entry.audiencePhoto), MEDIA_FOLDER_NAMES.MASTERSKIE, 80);
+    assignWithPriority(assignments, collectMediaIds(entry.afterLearningPhoto), MEDIA_FOLDER_NAMES.MASTERSKIE, 80);
   }
+}
 
-  const reports = (await strapi.entityService.findMany('api::annual-report.annual-report', {
-    populate: { pdf: true },
-  } as any)) as Array<{ pdf?: MediaLike }>;
+async function buildAssignments(strapi: Core.Strapi): Promise<Map<number, MediaFolderName>> {
+  const assignments = new Map<number, Assignment>();
+  const productCategories = await loadProductCategoryMap(strapi);
+  const morphRows = await loadMorphRows(strapi);
 
-  for (const report of reports) {
-    assign(collectMediaIds(report.pdf), MEDIA_FOLDER_NAMES.OTCHETY);
-  }
+  for (const row of morphRows) {
+    if (!row.file_id) continue;
 
-  const staticPages = [
-    ...asList(
-      await strapi.entityService.findMany('api::accessibility-page.accessibility-page', {
-        populate: { heroPhoto: true },
-      } as any),
-    ),
-    ...(await strapi.entityService.findMany('api::legal-document.legal-document', {
-      populate: { pdf: true },
-    } as any)),
-  ] as Array<{ heroPhoto?: MediaLike; pdf?: MediaLike }>;
-
-  for (const page of staticPages) {
-    assign(collectMediaIds(page.heroPhoto), MEDIA_FOLDER_NAMES.SAJT_STATIK);
-    assign(collectMediaIds(page.pdf), MEDIA_FOLDER_NAMES.SAJT_STATIK);
-  }
-
-  const allFiles = (await strapi.db.query(FILE_UID).findMany({
-    populate: { folder: true },
-  })) as Array<{ id: number; folder?: { id: number } | null }>;
-
-  for (const file of allFiles) {
-    if (!assignments.has(file.id)) {
-      assignments.set(file.id, MEDIA_FOLDER_NAMES.SAJT_STATIK);
-    }
-  }
-
-  let moved = 0;
-  let skipped = 0;
-
-  for (const [fileId, folderName] of assignments) {
-    const targetFolderId = folders.get(folderName);
-    if (!targetFolderId) continue;
-
-    const file = allFiles.find((f) => f.id === fileId);
-    if (file?.folder?.id === targetFolderId) {
-      skipped += 1;
+    if (row.related_type === 'api::product.product') {
+      const slug = productCategories.get(Number(row.related_id));
+      assignWithPriority(
+        assignments,
+        [row.file_id],
+        productCategoryToFolder(slug),
+        100,
+      );
       continue;
     }
 
-    await moveFileToFolder(strapi, fileId, targetFolderId);
-    moved += 1;
+    const fieldMap = FIELD_FOLDER_BY_TYPE[row.related_type];
+    const folder = fieldMap?.[row.field];
+    if (folder) {
+      assignWithPriority(assignments, [row.file_id], folder, 90);
+    }
   }
 
-  strapi.log.info(`media-folders: organize done — moved=${moved}, already_ok=${skipped}, total=${assignments.size}`);
+  await assignFromEntityService(strapi, assignments);
+
+  const allFiles = (await strapi.db.query(FILE_UID).findMany({
+    select: ['id'],
+  })) as Array<{ id: number }>;
+
+  for (const file of allFiles) {
+    if (!assignments.has(file.id)) {
+      assignments.set(file.id, { folder: MEDIA_FOLDER_NAMES.SAJT_STATIK, priority: 1 });
+    }
+  }
+
+  const resolved = new Map<number, MediaFolderName>();
+  for (const [fileId, value] of assignments) {
+    resolved.set(fileId, value.folder);
+  }
+  return resolved;
+}
+
+export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
+  const folders = await ensureMediaFolders(strapi);
+  const assignments = await buildAssignments(strapi);
+
+  const filesByFolder = new Map<MediaFolderName, number[]>();
+  for (const [fileId, folderName] of assignments) {
+    const list = filesByFolder.get(folderName) ?? [];
+    list.push(fileId);
+    filesByFolder.set(folderName, list);
+  }
+
+  const folderCounts: Record<string, number> = {};
+  let moved = 0;
+
+  for (const [folderName, fileIds] of filesByFolder) {
+    const folderId = folders.get(folderName);
+    if (!folderId) continue;
+
+    folderCounts[folderName] = fileIds.length;
+    await bulkMoveFilesToFolder(strapi, fileIds, folderId);
+    moved += fileIds.length;
+  }
+
+  strapi.log.info(
+    `media-folders: organize done — moved=${moved}, byFolder=${JSON.stringify(folderCounts)}`,
+  );
 }
 
 export function mediaFolderId(
