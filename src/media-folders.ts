@@ -356,27 +356,42 @@ export async function organizeMediaFolders(strapi: Core.Strapi): Promise<void> {
   const folders = await ensureMediaFolders(strapi);
   const assignments = await buildAssignments(strapi);
 
+  const allFiles = (await strapi.db.query(FILE_UID).findMany({
+    populate: { folder: true },
+  })) as Array<{ id: number; folder?: { id: number } | null }>;
+
   const filesByFolder = new Map<MediaFolderName, number[]>();
+  const folderCounts: Record<string, number> = {};
+  let skipped = 0;
+
   for (const [fileId, folderName] of assignments) {
+    folderCounts[folderName] = (folderCounts[folderName] ?? 0) + 1;
+
+    const targetFolderId = folders.get(folderName);
+    if (!targetFolderId) continue;
+
+    const file = allFiles.find((item) => item.id === fileId);
+    if (file?.folder?.id === targetFolderId) {
+      skipped += 1;
+      continue;
+    }
+
     const list = filesByFolder.get(folderName) ?? [];
     list.push(fileId);
     filesByFolder.set(folderName, list);
   }
 
-  const folderCounts: Record<string, number> = {};
   let moved = 0;
-
   for (const [folderName, fileIds] of filesByFolder) {
     const folderId = folders.get(folderName);
-    if (!folderId) continue;
+    if (!folderId || fileIds.length === 0) continue;
 
-    folderCounts[folderName] = fileIds.length;
     await bulkMoveFilesToFolder(strapi, fileIds, folderId);
     moved += fileIds.length;
   }
 
   strapi.log.info(
-    `media-folders: organize done — moved=${moved}, byFolder=${JSON.stringify(folderCounts)}`,
+    `media-folders: organize done — moved=${moved}, already_ok=${skipped}, byFolder=${JSON.stringify(folderCounts)}`,
   );
 }
 

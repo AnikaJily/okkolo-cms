@@ -107,7 +107,7 @@ export default {
       }
     }
 
-    if (process.env.ORGANIZE_MEDIA_FOLDERS !== 'false') {
+    if (process.env.ORGANIZE_MEDIA_FOLDERS === 'true') {
       try {
         await organizeMediaFolders(strapi);
       } catch (err) {
