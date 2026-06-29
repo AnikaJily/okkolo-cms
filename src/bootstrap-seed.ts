@@ -2,6 +2,13 @@ import path from 'node:path';
 import os from 'node:os';
 import fs from 'node:fs';
 import type { Core } from '@strapi/strapi';
+import {
+  ensureMediaFolders,
+  MEDIA_FOLDER_NAMES,
+  mediaFolderId,
+  productCategoryToFolder,
+  type MediaFolderName,
+} from './media-folders';
 
 type ProductCategory = 'ceramics' | 'clothing' | 'jewelry' | 'textile';
 type EventType = 'музыка' | 'мастер-класс' | 'лекция' | 'стенд-ап';
@@ -247,11 +254,22 @@ async function fetchImageToTmp(keywords: string, lock: number, w = 1200, h = 900
   return null;
 }
 
-async function uploadImage(strapi: Core.Strapi, filepath: string, displayName: string): Promise<number | null> {
+async function uploadImage(
+  strapi: Core.Strapi,
+  filepath: string,
+  displayName: string,
+  folderId?: number,
+): Promise<number | null> {
   try {
     const stat = await fs.promises.stat(filepath);
     const uploaded = await strapi.plugin('upload').service('upload').upload({
-      data: { fileInfo: { name: displayName, alternativeText: displayName } },
+      data: {
+        fileInfo: {
+          name: displayName,
+          alternativeText: displayName,
+          ...(folderId ? { folder: folderId } : {}),
+        },
+      },
       files: {
         filepath,
         originalFilename: path.basename(filepath),
@@ -278,11 +296,18 @@ async function uploadLocalImage(
   filepath: string,
   displayName: string,
   alt: string,
+  folderId?: number,
 ): Promise<number | null> {
   try {
     const stat = await fs.promises.stat(filepath);
     const uploaded = await strapi.plugin('upload').service('upload').upload({
-      data: { fileInfo: { name: displayName, alternativeText: alt } },
+      data: {
+        fileInfo: {
+          name: displayName,
+          alternativeText: alt,
+          ...(folderId ? { folder: folderId } : {}),
+        },
+      },
       files: {
         filepath,
         originalFilename: path.basename(filepath),
@@ -298,13 +323,19 @@ async function uploadLocalImage(
   }
 }
 
-async function getImageMediaId(strapi: Core.Strapi, keywords: string, lock: number, displayName: string): Promise<number | null> {
+async function getImageMediaId(
+  strapi: Core.Strapi,
+  keywords: string,
+  lock: number,
+  displayName: string,
+  folderId?: number,
+): Promise<number | null> {
   const tmp = await fetchImageToTmp(keywords, lock);
   if (!tmp) {
     strapi.log.warn(`seed: image fetch failed for ${displayName} (loremflickr ${keywords} lock=${lock})`);
     return null;
   }
-  return uploadImage(strapi, tmp, displayName);
+  return uploadImage(strapi, tmp, displayName, folderId);
 }
 
 async function clearCollection(strapi: Core.Strapi, uid: any, label: string) {
@@ -315,14 +346,15 @@ async function clearCollection(strapi: Core.Strapi, uid: any, label: string) {
   strapi.log.info(`seed: cleared ${items.length} ${label}`);
 }
 
-async function seedDirections(strapi: Core.Strapi) {
+async function seedDirections(strapi: Core.Strapi, folders: Map<MediaFolderName, number>) {
   const existing = await strapi.entityService.count('api::direction.direction', {});
   if (existing > 0) {
     strapi.log.info(`seed: directions already populated (${existing}), skip`);
     return;
   }
+  const folderId = mediaFolderId(folders, MEDIA_FOLDER_NAMES.NAPRAVLENIYA);
   for (const item of DIRECTIONS) {
-    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title);
+    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title, folderId);
     await strapi.entityService.create('api::direction.direction', {
       data: {
         title: item.title,
@@ -356,15 +388,16 @@ async function getEventTypeMap(strapi: Core.Strapi): Promise<Map<string, number>
   return new Map(types.map((t) => [t.name, t.id]));
 }
 
-async function seedEvents(strapi: Core.Strapi) {
+async function seedEvents(strapi: Core.Strapi, folders: Map<MediaFolderName, number>) {
   const existing = await strapi.entityService.count('api::event.event', {});
   if (existing > 0) {
     strapi.log.info(`seed: events already populated (${existing}), skip`);
     return;
   }
+  const folderId = mediaFolderId(folders, MEDIA_FOLDER_NAMES.MEROPRIYATIYA);
   const typeMap = await getEventTypeMap(strapi);
   for (const item of EVENTS) {
-    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title);
+    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title, folderId);
     const typeId = typeMap.get(item.type);
     if (!typeId) {
       strapi.log.warn(`seed: event "${item.title}" — type "${item.type}" not found in CMS`);
@@ -409,7 +442,7 @@ async function getCategoryMap(strapi: Core.Strapi): Promise<Map<string, number>>
   return new Map(cats.map((c) => [c.slug, c.id]));
 }
 
-async function seedProducts(strapi: Core.Strapi) {
+async function seedProducts(strapi: Core.Strapi, folders: Map<MediaFolderName, number>) {
   const existing = await strapi.entityService.count('api::product.product', {});
   if (existing > 0) {
     strapi.log.info(`seed: products already populated (${existing}), skip`);
@@ -419,7 +452,8 @@ async function seedProducts(strapi: Core.Strapi) {
   let created = 0;
   let skipped = 0;
   for (const item of PRODUCTS) {
-    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title);
+    const folderId = mediaFolderId(folders, productCategoryToFolder(item.category));
+    const imageId = await getImageMediaId(strapi, item.keywords, item.lock, item.title, folderId);
     if (!imageId) {
       strapi.log.warn(`seed: product "${item.title}" skipped — no image (image is required)`);
       skipped += 1;
@@ -470,7 +504,7 @@ async function seedMenuItems(strapi: Core.Strapi) {
   }
 }
 
-async function seedCafeMenuPage(strapi: Core.Strapi) {
+async function seedCafeMenuPage(strapi: Core.Strapi, folders: Map<MediaFolderName, number>) {
   /* count работает и для Single Type — вернёт 0 или 1. */
   const existing = await strapi.entityService.count('api::cafe-menu-page.cafe-menu-page', {});
   if (existing > 0) {
@@ -479,17 +513,18 @@ async function seedCafeMenuPage(strapi: Core.Strapi) {
   }
 
   const [main, summer] = MENU_POSTER_SOURCES;
+  const folderId = mediaFolderId(folders, MEDIA_FOLDER_NAMES.KOFejNYA);
 
   let mainId: number | null = null;
   if (fs.existsSync(main.path)) {
-    mainId = await uploadLocalImage(strapi, main.path, main.displayName, main.alt);
+    mainId = await uploadLocalImage(strapi, main.path, main.displayName, main.alt, folderId);
   } else {
     strapi.log.warn(`seed: cafe menu poster "${main.path}" not found, leaving empty`);
   }
 
   let summerId: number | null = null;
   if (fs.existsSync(summer.path)) {
-    summerId = await uploadLocalImage(strapi, summer.path, summer.displayName, summer.alt);
+    summerId = await uploadLocalImage(strapi, summer.path, summer.displayName, summer.alt, folderId);
   } else {
     strapi.log.warn(`seed: cafe menu poster "${summer.path}" not found, leaving empty`);
   }
@@ -509,13 +544,14 @@ async function seedCafeMenuPage(strapi: Core.Strapi) {
   );
 }
 
-async function seedShowroom(strapi: Core.Strapi) {
+async function seedShowroom(strapi: Core.Strapi, folders: Map<MediaFolderName, number>) {
   const existing = await strapi.entityService.count('api::showroom.showroom', {});
   if (existing > 0) {
     strapi.log.info(`seed: showroom already populated (${existing}), skip`);
     return;
   }
-  const imageId = await getImageMediaId(strapi, 'showroom,interior', 4001, 'Шоурум Окколо');
+  const folderId = mediaFolderId(folders, MEDIA_FOLDER_NAMES.SAJT_STATIK);
+  const imageId = await getImageMediaId(strapi, 'showroom,interior', 4001, 'Шоурум Окколо', folderId);
   await strapi.entityService.create('api::showroom.showroom', {
     data: {
       heroImage: imageId ?? undefined,
@@ -538,12 +574,14 @@ export async function runBootstrapSeed(strapi: Core.Strapi) {
     await clearCollection(strapi, 'api::showroom.showroom', 'showroom');
     await clearCollection(strapi, 'api::menu-item.menu-item', 'menu-items');
   }
-  await seedDirections(strapi);
+  const folders = await ensureMediaFolders(strapi);
+
+  await seedDirections(strapi, folders);
   await seedEventTypes(strapi);
-  await seedEvents(strapi);
+  await seedEvents(strapi, folders);
   await seedCategories(strapi);
-  await seedProducts(strapi);
-  await seedShowroom(strapi);
+  await seedProducts(strapi, folders);
+  await seedShowroom(strapi, folders);
   await seedMenuItems(strapi);
-  await seedCafeMenuPage(strapi);
+  await seedCafeMenuPage(strapi, folders);
 }

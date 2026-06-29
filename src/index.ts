@@ -4,6 +4,7 @@ import { registerTextToRelationAutolink } from './autolink-text-to-relation';
 import { registerEventRegistrationLink } from './event-registration-link';
 import { registerMenuItemAutoOrder } from './menu-item-auto-order';
 import { runBootstrapSeed } from './bootstrap-seed';
+import { organizeMediaFolders } from './media-folders';
 
 const PUBLIC_READ_UIDS = [
   'api::direction.direction',
@@ -103,6 +104,14 @@ export default {
         await runBootstrapSeed(strapi);
       } catch (err) {
         strapi.log.error('bootstrap: seed failed', err);
+      }
+    }
+
+    if (process.env.ORGANIZE_MEDIA_FOLDERS !== 'false') {
+      try {
+        await organizeMediaFolders(strapi);
+      } catch (err) {
+        strapi.log.error('bootstrap: media folder organize failed', err);
       }
     }
   },
